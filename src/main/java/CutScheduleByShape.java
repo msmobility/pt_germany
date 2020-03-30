@@ -34,7 +34,7 @@ public class CutScheduleByShape {
 
         String scheduleFile = "./output/" + service + "/schedule.xml";
         String newScheduleFile = "./output/" + service + "/scheduleMuc.xml";
-        String newVehicleFile =  "./output/" + service + "/vehiclesMuc.xml";
+        String newVehicleFile = "./output/" + service + "/vehiclesMuc.xml";
 
         Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         new TransitScheduleReader(scenario).readFile(scheduleFile);
@@ -45,7 +45,7 @@ public class CutScheduleByShape {
 
         //add all stops from first schedule if within study area
         for (TransitStopFacility stop : originalSchedule.getFacilities().values()) {
-            if( geometry.contains(GeometryUtils.createGeotoolsPoint(stop.getCoord()))) {
+            if (geometry.contains(GeometryUtils.createGeotoolsPoint(stop.getCoord()))) {
                 stopsInStudyArea.add(stop);
 
             }
@@ -55,19 +55,19 @@ public class CutScheduleByShape {
             TransitLine lineCopy = subsetSchedule.getFactory().createTransitLine(line.getId());
             for (TransitRoute route : line.getRoutes().values()) {
                 final boolean anyStopInside = route.getStops().stream().anyMatch(stop -> stopsInStudyArea.contains(stop.getStopFacility()));
-                if(anyStopInside) {
+                if (anyStopInside) {
                     lineCopy.addRoute(route);
                     route.getStops().stream().map(TransitRouteStop::getStopFacility).forEach(stop -> addStofIfNonExistent(stop, subsetSchedule));
                 }
             }
-            if(!lineCopy.getRoutes().isEmpty()) {
+            if (!lineCopy.getRoutes().isEmpty()) {
                 subsetSchedule.addTransitLine(lineCopy);
             }
         }
         new TransitScheduleWriterV2(subsetSchedule).write(newScheduleFile);
 
-        /*Vehicles vehicles = VehicleUtils.createVehiclesContainer();
 
+        /*        Vehicles vehicles = VehicleUtils.createVehiclesContainer();
         new CreateVehiclesForSchedule(subsetSchedule, vehicles).run();
         new VehicleWriterV1(vehicles).writeFile(newVehicleFile);*/
 
@@ -75,7 +75,7 @@ public class CutScheduleByShape {
     }
 
     private static void addStofIfNonExistent(TransitStopFacility stop, TransitSchedule subsetSchedule) {
-        if (!subsetSchedule.getFacilities().keySet().contains(stop.getId())){
+        if (!subsetSchedule.getFacilities().keySet().contains(stop.getId())) {
             subsetSchedule.addStopFacility(stop);
         }
     }
