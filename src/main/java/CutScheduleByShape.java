@@ -74,7 +74,7 @@ public class CutScheduleByShape {
 
     }
 
-    private static void addStofIfNonExistent(TransitStopFacility stop, TransitSchedule subsetSchedule) {
+    public static void addStofIfNonExistent(TransitStopFacility stop, TransitSchedule subsetSchedule) {
         if (!subsetSchedule.getFacilities().keySet().contains(stop.getId())) {
             subsetSchedule.addStopFacility(stop);
         }

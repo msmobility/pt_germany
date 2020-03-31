@@ -67,7 +67,7 @@ public class MergeSchedules {
 
     }
 
-    private static void createVehiclesForSchedule(TransitSchedule schedule, Vehicles vehicles) {
+    public static void createVehiclesForSchedule(TransitSchedule schedule, Vehicles vehicles) {
         VehiclesFactory vb = vehicles.getFactory();
         Map<String, VehicleType> vehicleTypeMap = new HashMap<>();
 
