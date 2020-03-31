@@ -36,6 +36,14 @@
             <id>pt2matsim</id>
             <url>http://dl.bintray.com/polettif/matsim</url>
         </repository>
+<!--        <repository>-->
+<!--            <id>SBB</id>-->
+<!--            <url>https://bintray.com/schweizerischebundesbahnen/simba.mvn/matsim-sbb-extensions</url>-->
+<!--        </repository>-->
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -96,6 +104,16 @@
             <groupId>org.matsim</groupId>
             <artifactId>pt2matsim</artifactId>
             <version>19.11</version>
+        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>ch.sbb</groupId>-->
+<!--            <artifactId>matsim-sbb-extensions</artifactId>-->
+<!--            <version>0.11.1</version> &lt;!&ndash; replace this with latest available version &ndash;&gt;-->
+<!--        </dependency>-->
+        <dependency>
+            <groupId>com.github.SchweizerischeBundesbahnen</groupId>
+            <artifactId>matsim-sbb-extensions</artifactId>
+            <version>v11.5</version>
         </dependency>
 
     </dependencies>
