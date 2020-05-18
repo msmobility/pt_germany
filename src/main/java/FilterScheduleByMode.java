@@ -17,17 +17,33 @@ public class FilterScheduleByMode {
 
     public static void main(String[] args) {
 
-        String service = "all";
+        /**
+         * name of the service that will be filtered
+         */
+        String service = "opnv";
 
-        String scheduleFile = "./output/" + service + "/mapped_schedule_muc.xml";
-        String newScheduleFile = "./output/" + service + "/mapped_schedule_muc_bus.xml";
+        /**
+         * original schedule file
+         */
+        String scheduleFile = "./output/" + service + "/schedule2.xml";
+        /**
+         * new schedule file
+         */
+        String newScheduleFile = "./output/" + service + "/schedule_germany_bus_tram_subway.xml";
 
-        String vehFileName = "./output/all/vehicleMuc_bus.xml";
+        /**
+         * new vehicle file
+         */
+        String vehFileName = "./output/" + service + "/vehicle_germany_bus_tram_subway.xml";
 
+
+        /**
+         * subset of modes to keep (according to the gtfs codes, i.e. "subway" instead of "metro"
+         */
         List<String> modes = new ArrayList<>();
         modes.add("bus");
-//        modes.add("tram");
-//        modes.add("subway");
+        modes.add("tram");
+        modes.add("subway");
 
         Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         new TransitScheduleReader(scenario).readFile(scheduleFile);
