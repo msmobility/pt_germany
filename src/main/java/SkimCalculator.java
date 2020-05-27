@@ -15,6 +15,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
+import skimCalculator.MyCalculateSkimMatrices;
 
 import java.io.IOException;
 import java.util.Random;
@@ -26,12 +27,12 @@ public class SkimCalculator {
     private static Logger log = Logger.getLogger(SkimCalculator.class);
 
     public static void main(String[] args) throws IOException {
-        String zonesShapeFilename = "./input/zones/zones.shp";
-        String zonesIdAttributeName = "id";
-        String outputDirectory = "./output/skims/db";
+        String zonesShapeFilename = "./input/zones/de_zones_attributes.shp";
+        String zonesIdAttributeName = "TAZ_id";
+        String outputDirectory = "./output/skims/germany_opnv_rb/";
         Config config = ConfigUtils.loadConfig("./sbbConfig.xml");
-        String networkFilename = "./output/db/network_muc_merged.xml.gz";
-        String transitScheduleFilename = "./output/db/mapped_muc_schedule.xml";
+        String networkFilename = "./output/opnv_rb/network_merged_germany_all.xml.gz";
+        String transitScheduleFilename = "./output/opnv_rb/schedule_germany_all_mapped.xml";
 
 
         CalculateSkimMatrices skims = new CalculateSkimMatrices(zonesShapeFilename, zonesIdAttributeName, outputDirectory, 16);
@@ -39,7 +40,7 @@ public class SkimCalculator {
         // alternative if you don't have facilities:
         skims.calculateSamplingPointsPerZoneFromNetwork(networkFilename, 1, new Random(0));
         //skims.calculateNetworkMatrices(networkFilename, eventsFilename, timesCar, config, null, link -> true);
-        skims.calculatePTMatrices(networkFilename, transitScheduleFilename, 8*60*60, 9*60*60, config, null, (line, route) -> isRailTramOrSubway(route));
+        skims.calculatePTMatrices(networkFilename, transitScheduleFilename, 8*60*60, 8.01*60*60, config, null, (line, route) -> isRailTramOrSubway(route));
 
         //skims.calculateBeelineMatrix();
 
