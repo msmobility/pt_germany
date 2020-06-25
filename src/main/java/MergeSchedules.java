@@ -36,8 +36,8 @@ public class MergeSchedules {
         /*
         Add here the n schedules to merge (if more or less, some minor changes in the code may be required)
          */
-        new TransitScheduleReader(scenarioOne).readFile("./output/opnv/schedule_germany_bus_tram_subway.xml");
-        new TransitScheduleReader(scenarioTwo).readFile("./output/rb/schedule.xml");
+        new TransitScheduleReader(scenarioOne).readFile("./output/opnv_rb/schedule_germany_all.xml");
+        new TransitScheduleReader(scenarioTwo).readFile("./output/db/schedule.xml");
         //new TransitScheduleReader(scenarioThree).readFile("./output/db/schedule.xml");
         //new TransitScheduleReader(scenarioFour).readFile("./output/flixbus/schedule.xml");
         TransitSchedule scheduleOne = scenarioOne.getTransitSchedule();
@@ -50,8 +50,8 @@ public class MergeSchedules {
         /**
          * Define suffixes to the schedule elements to prevent duplicate ids
          */
-        scheduleOne = addSuffixToScheduleElements(scheduleOne, "_opnv");
-        scheduleTwo = addSuffixToScheduleElements(scheduleTwo, "_rb");
+        scheduleOne = addSuffixToScheduleElements(scheduleOne, "");
+        scheduleTwo = addSuffixToScheduleElements(scheduleTwo, "_db");
         //scheduleThree = addSuffixToScheduleElements(scheduleThree, "_ld");
         //scheduleFour = addSuffixToScheduleElements(scheduleFour, "_flixbus");
 
@@ -75,11 +75,11 @@ public class MergeSchedules {
         /**
          * Define output files for schedule and vehicles
          */
-        new TransitScheduleWriter(mergedSchedule).writeFile("./output/opnv_rb/schedule_germany_all.xml");
+        new TransitScheduleWriter(mergedSchedule).writeFile("./output/opnv_rb_db/schedule_germany_all.xml");
 
         Vehicles vehicles = VehicleUtils.createVehiclesContainer();
         createVehiclesForSchedule(mergedSchedule, vehicles);
-        new VehicleWriterV1(vehicles).writeFile("./output/opnv_rb/vehicles_germany_all.xml");
+        new VehicleWriterV1(vehicles).writeFile("./output/opnv_rb_db/vehicles_germany_all.xml");
 
 
     }

@@ -116,6 +116,13 @@
             <version>v11.5</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.github.msmobility</groupId>
+            <artifactId>silo</artifactId>
+            <version>master-SNAPSHOT</version>
+        </dependency>
+
+
     </dependencies>
 
     <properties>

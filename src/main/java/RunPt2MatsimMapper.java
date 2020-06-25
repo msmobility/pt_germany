@@ -9,7 +9,7 @@ public class RunPt2MatsimMapper {
     public static void main(String[] args) {
 
         //service is rb, db, etc. It is the prefix of the config file
-        String service = "opnvRb";
+        String service = "opnvRbDb";
 
         /**
          * The config file must include the paths to schedule files, road network and other settings
