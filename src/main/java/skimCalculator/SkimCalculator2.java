@@ -1,7 +1,5 @@
 package skimCalculator;
 
-import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
-import ch.sbb.matsim.routing.pt.raptor.*;
 import com.pb.common.matrix.Matrix;
 import de.tum.bgu.msm.utils.SiloUtil;
 import org.apache.log4j.Logger;
@@ -24,12 +22,10 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterImpl;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-
 
 public class SkimCalculator2 {
 
@@ -88,25 +84,14 @@ public class SkimCalculator2 {
         transitConfig.setAdditionalTransferTime(60);
         transitConfig.setBeelineWalkSpeed(3/3.6);
 
-        RaptorStaticConfig raptorConfig = RaptorUtils.createStaticConfig(config);
-        raptorConfig.setOptimization(RaptorStaticConfig.RaptorOptimization.OneToAllRouting);
-        SwissRailRaptorData raptorData = SwissRailRaptorData.create(scenario.getTransitSchedule(), raptorConfig, scenario.getNetwork());
-        RaptorParameters raptorParameters = RaptorUtils.createParameters(config);
 
         facilitiesByTaz.keySet().parallelStream().forEach(originTAZ -> {
-
-            SwissRailRaptor raptor = new SwissRailRaptor(raptorData, new DefaultRaptorParametersForPerson(config), new LeastCostRaptorRouteSelector(),
-                    new DefaultRaptorStopFinder(null, config, new DefaultRaptorIntermodalAccessEgress(),null  ));
-            //TransitRouter transitRouter = new SwissRailRaptorRoutingModule(raptor, scenario.getTransitSchedule(), scenario.getNetwork(), );
-            //TransitRouter transitRouter = new TransitRouterImpl(transitConfig, scenario.getTransitSchedule());
+            TransitRouter transitRouter = new TransitRouterImpl(transitConfig, scenario.getTransitSchedule());
             ActivityFacility originFacility = facilitiesByTaz.get(originTAZ);
-            Map<Id<TransitStopFacility>, SwissRailRaptorCore.TravelInfo> tree = raptor.calcTree(originFacility, 10 * 60 * 60, null);
-
             for (ModelTAZ destinationTAZ : facilitiesByTaz.keySet()) {
                 if (originTAZ.id < destinationTAZ.id) {
                     ActivityFacility destinationFacility = facilitiesByTaz.get(destinationTAZ);
-                    RaptorRoute raptorRoute = tree.get(destinationFacility).getRaptorRoute();
-                    List<? extends PlanElement> route = (List<? extends PlanElement>) raptorRoute;
+                    List<? extends PlanElement> route = transitRouter.calcRoute(originFacility, destinationFacility, 10 * 60 * 60, null);
                     float sumTravelTime_min = 0;
                     int sequence = 0;
                     float access_min = 0;
@@ -277,7 +262,7 @@ public class SkimCalculator2 {
             BufferedReader bufferReader = new BufferedReader(new FileReader(zoneFile));
 
             String headerLine = bufferReader.readLine();
-            String[] header = headerLine.split(";");
+            String[] header = headerLine.split("\\s*,\\s*");
 
             int posId = SiloUtil.findPositionInArray("ZONE", header);
             int posX = SiloUtil.findPositionInArray("X", header);
@@ -286,7 +271,7 @@ public class SkimCalculator2 {
             //int posDistToClosest = SiloUtil.findPositionInArray("dist", header);
 
             while ((line = bufferReader.readLine()) != null) {
-                String[] splitLine = line.split(";");
+                String[] splitLine = line.split(",");
 
                 int id = Integer.parseInt(splitLine[posId]);
                 double x = Double.parseDouble(splitLine[posX]);
