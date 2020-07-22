@@ -1,6 +1,7 @@
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.pt.transitSchedule.TransitRouteStopImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV2;
 import org.matsim.pt.transitSchedule.api.*;
@@ -35,6 +36,7 @@ public class RemoveOneStopLines {
             boolean add = true;
 
             for (TransitRoute transitRoute : transitLine.getRoutes().values()){
+
                 if (transitRoute.getStops().size() < 2){
                     System.out.println("Unplausible line " + transitLine.getId());
                     add = false;

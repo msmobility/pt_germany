@@ -11,6 +11,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.GeometryUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.pt.transitSchedule.DepartureImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV2;
 import org.matsim.pt.transitSchedule.api.*;

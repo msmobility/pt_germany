@@ -13,10 +13,10 @@ public class RunPt2Matsim {
         String service = args[0];
 
         String folderToGtfs = "./input/gtfs/" + service + "/";
-        String sampleDayParam = "dayWithMostServices";
+        String sampleDayParam = "dayWithMostTrips";
         String outputCoordSystem = "EPSG:31468";
-        String scheduleFile = "./output/" + service + "/schedule.xml";
-        String vehicleFile =  "./output/" + service + "/vehicles.xml";
+        String scheduleFile = "./output/" + service + "/scheduleMostTrips.xml";
+        String vehicleFile =  "./output/" + service + "/vehiclesMostTrips.xml";
 
         Gtfs2TransitSchedule.run(folderToGtfs, sampleDayParam, outputCoordSystem, scheduleFile, vehicleFile );
 
