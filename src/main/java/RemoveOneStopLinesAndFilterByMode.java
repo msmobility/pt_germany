@@ -8,7 +8,7 @@ import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
 
-public class RemoveOneStopLines {
+public class RemoveOneStopLinesAndFilterByMode {
 
     public static void main(String[] args) {
 
@@ -16,8 +16,8 @@ public class RemoveOneStopLines {
         Scenario scenarioOne = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
         new TransitScheduleReader(scenarioOne).readFile("./schedules/originalVersionOfTheSchedule.xml");
-        String newScheduleFile = "./output/opnv/Schedule2_step2/schedule.xml" ;
-        String vehFileName = "./output/opnv/Schedule2_step2/vehicles.xml";
+        String newScheduleFile = "./output/opnv/FilteredAndRemoved/schedule.xml" ;
+        String vehFileName = "./output/opnv/FilteredAndRemoved/vehicles.xml";
 
 
 //        String networkFile = "./output/opnv/network_merged.xml.gz";
@@ -33,6 +33,14 @@ public class RemoveOneStopLines {
 
         for (TransitLine transitLine : transitSchedule.getTransitLines().values()) {
             boolean add = true;
+            if (transitLine.getId().toString().contains("Flixbus")){
+                add=false;
+            }
+            if (transitLine.getName() != null){
+                if(transitLine.getName().contains("Flixbus")){
+                    add=false;
+                }
+            }
             if(transitLine.getRoutes().isEmpty()){
                 System.out.println("Line without route");
                 add = false;
@@ -41,6 +49,10 @@ public class RemoveOneStopLines {
             for (TransitRoute transitRoute : transitLine.getRoutes().values()){
                 if (transitRoute.getStops().size() < 2){
                     System.out.println("Unplausible line " + transitLine.getId());
+                    add = false;
+                }
+                if (transitRoute.getTransportMode().equals("train")){
+                    System.out.println("Line with at least one route with train as a mode: " + transitLine.getId());
                     add = false;
                 }
             }

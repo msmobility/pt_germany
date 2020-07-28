@@ -1,27 +1,20 @@
-
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.prep.PreparedGeometry;
-import org.locationtech.jts.geom.prep.PreparedGeometryFactory;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.utils.geometry.GeometryUtils;
-import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
-import org.matsim.pt.transitSchedule.TransitScheduleWriterV2;
 import org.matsim.pt.transitSchedule.api.*;
-import org.matsim.pt.utils.CreateVehiclesForSchedule;
-import org.matsim.pt2matsim.tools.ScheduleTools;
 import org.matsim.vehicles.*;
-import org.opengis.feature.simple.SimpleFeature;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-public class MergeSchedules {
+// This class is an adaptation of the class MergeSchedules for the OSM public transport data, taking its specificity into account.
+public class MergeSchedulesOSM {
+
+    static int vehicleNumber = 0;
 
     public static void main(String[] args) {
 
@@ -131,7 +124,7 @@ public class MergeSchedules {
         }
 
         {
-            VehicleType vehicleType = vb.createVehicleType(Id.create("rail", VehicleType.class));
+            VehicleType vehicleType = vb.createVehicleType(Id.create("train", VehicleType.class));
             VehicleCapacity capacity = new VehicleCapacityImpl();
             capacity.setSeats(Integer.valueOf(300));
             capacity.setStandingRoom(Integer.valueOf(0));
@@ -140,14 +133,33 @@ public class MergeSchedules {
             vehicleTypeMap.put(vehicleType.getId().toString(), vehicleType);
         }
 
+        {
+            VehicleType vehicleType = vb.createVehicleType(Id.create("funicular", VehicleType.class));
+            VehicleCapacity capacity = new VehicleCapacityImpl();
+            capacity.setSeats(Integer.valueOf(30));
+            capacity.setStandingRoom(Integer.valueOf(0));
+            vehicleType.setCapacity(capacity);
+            vehicles.addVehicleType(vehicleType);
+            vehicleTypeMap.put(vehicleType.getId().toString(), vehicleType);
+        }
+
+        {
+            VehicleType vehicleType = vb.createVehicleType(Id.create("ferry", VehicleType.class));
+            VehicleCapacity capacity = new VehicleCapacityImpl();
+            capacity.setSeats(Integer.valueOf(100));
+            capacity.setStandingRoom(Integer.valueOf(0));
+            vehicleType.setCapacity(capacity);
+            vehicles.addVehicleType(vehicleType);
+            vehicleTypeMap.put(vehicleType.getId().toString(), vehicleType);
+        }
+
+
         for (TransitLine line : schedule.getTransitLines().values()) {
-            System.out.println(line.getId());
             for (TransitRoute route : line.getRoutes().values()) {
-                System.out.println(route.getStops());
                 for (Departure departure : route.getDepartures().values()) {
-                    System.out.println(route.getDepartures().values().toString());
-                    Id<Vehicle> vehicleId = departure.getVehicleId();
-                    VehicleType vehicleType = getVehicleTypeFromId(vehicleId, vehicleTypeMap);
+                    VehicleType vehicleType = vehicleTypeMap.get(route.getTransportMode());
+                    Id<Vehicle> vehicleId = Id.createVehicleId("veh_" + vehicleNumber + "_" + route.getTransportMode());
+                    vehicleNumber++;
                     Vehicle veh = vb.createVehicle(vehicleId, vehicleType);
                     vehicles.addVehicle(veh);
                     departure.setVehicleId(veh.getId());
