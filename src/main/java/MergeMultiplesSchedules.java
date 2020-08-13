@@ -176,7 +176,7 @@ public class MergeMultiplesSchedules {
                 for (Departure departure : route.getDepartures().values()) {
                     departure.getDepartureTime();
                     Id<Departure> newDepartureId = Id.create(departure.getId() + suffix, Departure.class);
-                    Id<Vehicle> newVehicleId = Id.create(departure.getVehicleId() + suffix, Vehicle.class);
+                    Id<Vehicle> newVehicleId = Id.create(newDepartureId.toString(), Vehicle.class);
                     Departure newDeparture = factory.createDeparture(newDepartureId, departure.getDepartureTime());
                     newDeparture.setVehicleId(newVehicleId);
                     newRoute.addDeparture(newDeparture);
