@@ -11,46 +11,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MergeSchedules {
+public class MergeMultiplesSchedules {
 
     public static void main(String[] args) {
 
-        /**
-         * initialize n scenarios
-         */
-        Scenario scenarioOne = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-        Scenario scenarioTwo = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-        //Scenario scenarioThree = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-        //Scenario scenarioFour= ScenarioUtils.createScenario(ConfigUtils.createConfig());
-
-        /*
-        Add here the n schedules to merge (if more or less, some minor changes in the code may be required)
-         */
-        new TransitScheduleReader(scenarioOne).readFile("./output/opnv_rb/schedule_germany_all.xml");
-        new TransitScheduleReader(scenarioTwo).readFile("./output/db/schedule.xml");
-        //new TransitScheduleReader(scenarioThree).readFile("./output/db/schedule.xml");
-        //new TransitScheduleReader(scenarioFour).readFile("./output/flixbus/schedule.xml");
-        TransitSchedule scheduleOne = scenarioOne.getTransitSchedule();
-        TransitSchedule scheduleTwo = scenarioTwo.getTransitSchedule();
-        //TransitSchedule scheduleThree = scenarioThree.getTransitSchedule();
-        //TransitSchedule scheduleFour = scenarioFour.getTransitSchedule();
-
-        final TransitSchedule mergedSchedule = new TransitScheduleFactoryImpl().createTransitSchedule();
-
-        /**
-         * Define suffixes to the schedule elements to prevent duplicate ids
-         */
-        scheduleOne = addSuffixToScheduleElements(scheduleOne, "");
-        scheduleTwo = addSuffixToScheduleElements(scheduleTwo, "_db");
-        //scheduleThree = addSuffixToScheduleElements(scheduleThree, "_ld");
-        //scheduleFour = addSuffixToScheduleElements(scheduleFour, "_flixbus");
-
         List<TransitSchedule> transitSchedules = new ArrayList<>();
 
-        transitSchedules.add(scheduleOne);
-        transitSchedules.add(scheduleTwo);
-        //transitSchedules.add(scheduleThree);
-        //transitSchedules.add(scheduleFour);
+        for (int i = 0; i < args.length; i++){
+            Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+            new TransitScheduleReader(scenario).readFile(args[i]);
+            TransitSchedule schedule = scenario.getTransitSchedule();
+            schedule = addSuffixToScheduleElements(schedule, "_" + i);
+            transitSchedules.add(schedule);
+        }
+
+        final TransitSchedule mergedSchedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 
         for (TransitSchedule schedule : transitSchedules){
             for (TransitStopFacility stop : schedule.getFacilities().values()) {
@@ -65,11 +40,11 @@ public class MergeSchedules {
         /**
          * Define output files for schedule and vehicles
          */
-        new TransitScheduleWriter(mergedSchedule).writeFile("./output/opnv_rb_db/schedule_germany_all.xml");
+        new TransitScheduleWriter(mergedSchedule).writeFile("./output/opnv_rb_v2/schedule_germany_all.xml");
 
         Vehicles vehicles = VehicleUtils.createVehiclesContainer();
         createVehiclesForSchedule(mergedSchedule, vehicles);
-        new VehicleWriterV1(vehicles).writeFile("./output/opnv_rb_db/vehicles_germany_all.xml");
+        new VehicleWriterV1(vehicles).writeFile("./output/opnv_rb_v2/vehicles_germany_all.xml");
 
 
     }
