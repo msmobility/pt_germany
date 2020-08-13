@@ -25,8 +25,8 @@ public class AddDeparturesAndTravelTimes {
 
         Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-        new TransitScheduleReader(scenario).readFile("Z:/projects/2019/BASt/data/network/ground_pt_matsim/additional_opnv_data/osm_areas/Aalen_OstSchedules.xml");
-        String newScheduleFile = "Z:/projects/2019/BASt/data/network/ground_pt_matsim/additional_opnv_data/osm_areas/Aalen_OstSchedules_2.xml" ;
+        new TransitScheduleReader(scenario).readFile("./output/opnv/Schedule2_step2/schedule.xml");
+        String newScheduleFile = "./output/opnv/Schedule2_step2/vehicles.xml" ;
         //String newVehFile = "./output/opnv/vehicles.xml";
 
         TransitSchedule transitSchedule = scenario.getTransitSchedule();
@@ -53,7 +53,15 @@ public class AddDeparturesAndTravelTimes {
                 for (index = 1; index < stops.size(); index++){
                     TransitRouteStop nextStop = stops.get(index);
                     double distance_m = NetworkUtils.getEuclideanDistance(previousStop.getStopFacility().getCoord(), nextStop.getStopFacility().getCoord());
-                    cumTime_s += distance_m / 30 * 3.6;
+                    if (distance_m <= 50){
+                        continue;
+                    }
+                    else if (distance_m > 50 && distance_m < 800) {
+                        cumTime_s += 1.3 * distance_m / 30 * 3.6;
+                    }
+                    else{
+                        cumTime_s += 1.3 * distance_m / 50 * 3.6;
+                    }
                     TransitRouteStop newNextStop = transitScheduleFactory.createTransitRouteStop(nextStop.getStopFacility(),cumTime_s, cumTime_s + STOPPING_TIME_S );
                     newNextStop.setAwaitDepartureTime(true);
                     newStops.add(newNextStop);
@@ -79,7 +87,7 @@ public class AddDeparturesAndTravelTimes {
         new TransitScheduleWriterV2(newTransitSchedule).write(newScheduleFile);
 
         Vehicles vehicles = VehicleUtils.createVehiclesContainer();
-       // MergeSchedules.createVehiclesForSchedule(newTransitSchedule, vehicles);
+        // MergeSchedules.createVehiclesForSchedule(newTransitSchedule, vehicles);
         //new VehicleWriterV1(vehicles).writeFile(newVehFile);
 
 
