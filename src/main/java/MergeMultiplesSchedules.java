@@ -105,10 +105,17 @@ public class MergeMultiplesSchedules {
             vehicleTypeMap.put(vehicleType.getId().toString(), vehicleType);
         }
 
+        int duplicateVehicleCounter = 0;
         for (TransitLine line : schedule.getTransitLines().values()) {
             for (TransitRoute route : line.getRoutes().values()) {
                 for (Departure departure : route.getDepartures().values()) {
-                    Id<Vehicle> vehicleId = departure.getVehicleId();
+                    Id<Vehicle> vehicleId = Id.createVehicleId(line.getId().toString() + "_" + route.getId() + "_" + departure.getVehicleId().toString());
+                    if (vehicles.getVehicles().get(vehicleId)!= null){
+                        vehicleId = Id.createVehicleId(line.getId().toString() + "_" + route.getId() + "_" +
+                                departure.getVehicleId().toString() + "_" + duplicateVehicleCounter);
+                        System.out.println("Vehicle/departure duplicate!");
+                        duplicateVehicleCounter++;
+                    }
                     VehicleType vehicleType = getVehicleTypeFromId(vehicleId, vehicleTypeMap);
                     Vehicle veh = vb.createVehicle(vehicleId, vehicleType);
                     vehicles.addVehicle(veh);
@@ -116,6 +123,7 @@ public class MergeMultiplesSchedules {
                 }
             }
         }
+        System.out.println("There are " + duplicateVehicleCounter + " duplicates");
 
 
 
