@@ -13,13 +13,13 @@ public class SurveyProcessor {
 
     public static void main(String[] args) throws IOException {
 
-        String fileName = "MiD_10_trips_with_coordinates.csv";
-        String outputFileName = "MiD_10_trips_with_trip_data.csv";
+        String fileName = "Z:\\projects\\2019\\BASt\\data\\MiD_analysis\\trip_data2017_complete_case_coord_v1.csv";
+        String outputFileName = "Z:\\projects\\2019\\BASt\\data\\MiD_analysis\\output_carlos.csv";
 
         Map<Integer, SurveyTrip> tripMap = new SurveyReader().readSurvey(fileName);
 
         Config config = ConfigUtils.createConfig();
-        config.network().setInputFile("germany_w_tertiary.xml.gz");
+        config.network().setInputFile("Z:\\projects\\2019\\BASt\\data\\MiD_analysis\\germany_w_tertiary.xml.gz");
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
 
