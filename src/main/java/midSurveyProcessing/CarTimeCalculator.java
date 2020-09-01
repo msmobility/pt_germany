@@ -36,6 +36,7 @@ public class CarTimeCalculator {
 
     public void assignCarTravelTimes(Map<Integer, SurveyTrip> tripMap){
 
+        int counterOfZeros = 0;
         for (SurveyTrip trip : tripMap.values()){
 
 
@@ -54,8 +55,12 @@ public class CarTimeCalculator {
             }
 
             double speed_kmh = distance / time * 3.6;
-            if (speed_kmh > 121 || Double.isNaN(speed_kmh) || Double.isInfinite(speed_kmh)) {
+            if (speed_kmh > 121 ) {
                 System.out.println("Trip with too high speed: V = " + speed_kmh + " id = " + trip.getId() );
+            }
+
+            if (Double.isNaN(speed_kmh) || Double.isInfinite(speed_kmh)){
+                counterOfZeros++;
             }
 
             if(trip.getId() % 10000 == 0){
@@ -66,6 +71,7 @@ public class CarTimeCalculator {
             trip.setCarDistance(distance);
 
         }
+        System.out.println("Trips with zero distance (same entrance and exit node): " + counterOfZeros);
 
     }
 
