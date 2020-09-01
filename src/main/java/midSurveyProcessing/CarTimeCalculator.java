@@ -62,6 +62,9 @@ public class CarTimeCalculator {
                 System.out.println("Completed " + trip.getId() + " trips.");
             }
 
+            trip.setCarTravelTime(time);
+            trip.setCarDistance(distance);
+
         }
 
     }
