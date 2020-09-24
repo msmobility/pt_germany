@@ -11,7 +11,7 @@ public class RunScheduleValidator {
     public static void main(String[] args) throws ParserConfigurationException, SAXException, IOException {
 
 
-        String service = args[0];
+        String service = "opnv_rb_v2";
         String scheduleFile = "./output/" + service + "/mapped_schedule.xml";
         String networkFile = "./output/" + service + "/network_merged.xml.gz";
 
