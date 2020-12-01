@@ -27,19 +27,19 @@ public class SkimCalculator {
     private static Logger log = Logger.getLogger(SkimCalculator.class);
 
     public static void main(String[] args) throws IOException {
-        String zonesShapeFilename = "./input/zones/de_zones_attributes.shp";
+        String zonesShapeFilename = "./input/zones/zones_eu_skimCalculation.shp";
         String zonesIdAttributeName = "TAZ_id";
 
-        Config config = ConfigUtils.loadConfig("./sbbConfig.xml");
+        Config config = ConfigUtils.loadConfig("./sbbConfigTest.xml");
         //RaptorUtils.createStaticConfig(config);
         //RaptorUtils.createParameters(config);
 
-        String mode = "all";
+        String mode = "ld_train_2";
 
         //for the v2
-        String outputDirectory = "./output/skims/germany_all_v4/";
-        String networkFilename = "./output/opnv_rb_v2/network_merged_germany_all.xml.gz";
-        String transitScheduleFilename = "./output/opnv_rb_v2/schedule_germany_" + mode + "_mapped.xml";
+        String outputDirectory = "./output/skims/germany_auto_2";
+        String networkFilename = "./output/eu_germany_network_w_connector.xml";
+        String transitScheduleFilename = "./output/ld_train_2/mapped_schedule.xml";
 
 //        String outputDirectory = "./output/skims/germany_all_v1/";
 //        String networkFilename = "./output/opnv/network_merged_germany_bus.xml.gz";
@@ -51,9 +51,10 @@ public class SkimCalculator {
         //skims.calculateSamplingPointsPerZoneFromFacilities(facilitiesFilename, numberOfPointsPerZone, r, facility -> 1.0);
         // alternative if you don't have facilities:
         skims.calculateSamplingPointsPerZoneFromNetwork(networkFilename, 1, new Random(0));
-        //skims.calculateNetworkMatrices(networkFilename, eventsFilename, timesCar, config, null, link -> true);
-        skims.calculatePTMatrices(networkFilename, transitScheduleFilename, 8 * 60 * 60, 14 * 60 * 60, config,
-                mode, (line, route) -> isRailTramOrSubway(route));
+        double[] timesCar = new double[]{8 * 3600};
+        skims.calculateNetworkMatrices(networkFilename, null, timesCar, config, null, link -> true);
+        //skims.calculatePTMatrices(networkFilename, transitScheduleFilename, 8 * 60 * 60, 14 * 60 * 60, config,
+               // mode, (line, route) -> isRail(route));
 
         //skims.calculateBeelineMatrix();
 
@@ -67,6 +68,17 @@ public class SkimCalculator {
         if (route.getTransportMode().equalsIgnoreCase("rail") ||
                 route.getTransportMode().equalsIgnoreCase("tram") ||
                 route.getTransportMode().equalsIgnoreCase("subway")) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /*
+       Use this for mito mode == tramMetro, to find when these modes are not used.
+        */
+    private static boolean isCoach(TransitRoute route) {
+        if (route.getTransportMode().equalsIgnoreCase("coach")) {
             return true;
         } else {
             return false;
