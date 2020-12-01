@@ -347,7 +347,7 @@ private static final Logger log = Logger.getLogger(MyCalculateSkimMatrices.class
 
             log.info("calc PT matrices for " + Time.writeTime(startTime) + " - " + Time.writeTime(endTime));
             MyPtSkimMatrices.PtIndicators<String> matrices = MyPtSkimMatrices.calculateSkimMatrices(
-                    raptorData, this.zonesById, this.coordsPerZone, startTime, endTime, 60*30, raptorParameters, this.numberOfThreads, trainDetector);
+                    raptorData, this.zonesById, this.coordsPerZone, startTime, endTime, 3600, raptorParameters, this.numberOfThreads, trainDetector);
 
             log.info("write PT matrices to " + outputDirectory + (prefix.isEmpty() ? "" : (" with prefix " + prefix)));
             FloatMatrixIO.writeAsCSV(matrices.adaptionTimeMatrix, outputDirectory + "/" + prefix + PT_ADAPTIONTIMES_FILENAME);

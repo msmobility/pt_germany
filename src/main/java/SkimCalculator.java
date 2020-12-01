@@ -29,18 +29,31 @@ public class SkimCalculator {
     public static void main(String[] args) throws IOException {
         String zonesShapeFilename = "./input/zones/de_zones_attributes.shp";
         String zonesIdAttributeName = "TAZ_id";
-        String outputDirectory = "./output/skims/germany_opnv_db_rb_2/";
-        Config config = ConfigUtils.loadConfig("./sbbConfig.xml");
-        String networkFilename = "./output/opnv_rb_db/network_merged_germany_all.xml.gz";
-        String transitScheduleFilename = "./output/opnv_rb_db/schedule_germany_all_mapped.xml";
 
+        Config config = ConfigUtils.loadConfig("./sbbConfig.xml");
+        //RaptorUtils.createStaticConfig(config);
+        //RaptorUtils.createParameters(config);
+
+        String mode = "all";
+
+        //for the v2
+        String outputDirectory = "./output/skims/germany_all_v4/";
+        String networkFilename = "./output/opnv_rb_v2/network_merged_germany_all.xml.gz";
+        String transitScheduleFilename = "./output/opnv_rb_v2/schedule_germany_" + mode + "_mapped.xml";
+
+//        String outputDirectory = "./output/skims/germany_all_v1/";
+//        String networkFilename = "./output/opnv/network_merged_germany_bus.xml.gz";
+//        String transitScheduleFilename = "./output/opnv/schedule_germany_" + mode + "_mapped.xml";
 
         MyCalculateSkimMatrices skims = new MyCalculateSkimMatrices(zonesShapeFilename, zonesIdAttributeName, outputDirectory, 16);
+        //skims.loadSamplingPointsFromFile("./input/centroids/meanStopsCSVModified.csv");
+
         //skims.calculateSamplingPointsPerZoneFromFacilities(facilitiesFilename, numberOfPointsPerZone, r, facility -> 1.0);
         // alternative if you don't have facilities:
         skims.calculateSamplingPointsPerZoneFromNetwork(networkFilename, 1, new Random(0));
         //skims.calculateNetworkMatrices(networkFilename, eventsFilename, timesCar, config, null, link -> true);
-        skims.calculatePTMatrices(networkFilename, transitScheduleFilename, 8*60*60, 9*60*60, config, null, (line, route) -> isRail(route));
+        skims.calculatePTMatrices(networkFilename, transitScheduleFilename, 8 * 60 * 60, 14 * 60 * 60, config,
+                mode, (line, route) -> isRailTramOrSubway(route));
 
         //skims.calculateBeelineMatrix();
 

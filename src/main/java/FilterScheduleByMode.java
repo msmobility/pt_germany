@@ -20,21 +20,21 @@ public class FilterScheduleByMode {
         /**
          * name of the service that will be filtered
          */
-        String service = "opnv";
+        String service = "opnv_rb_v2";
 
         /**
          * original schedule file
          */
-        String scheduleFile = "./output/" + service + "/schedule2.xml";
+        String scheduleFile = "./output/" + service + "/schedule_germany_all_mapped.xml";
         /**
          * new schedule file
          */
-        String newScheduleFile = "./output/" + service + "/schedule_germany_bus_tram_subway.xml";
+        String newScheduleFile = "./output/" + service + "/schedule_germany_bus.xml";
 
         /**
          * new vehicle file
          */
-        String vehFileName = "./output/" + service + "/vehicle_germany_bus_tram_subway.xml";
+        String vehFileName = "./output/" + service + "/vehicle_germany_bus.xml";
 
 
         /**
@@ -42,8 +42,8 @@ public class FilterScheduleByMode {
          */
         List<String> modes = new ArrayList<>();
         modes.add("bus");
-        modes.add("tram");
-        modes.add("subway");
+        //modes.add("tram");
+        //modes.add("subway");
 
         Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         new TransitScheduleReader(scenario).readFile(scheduleFile);
