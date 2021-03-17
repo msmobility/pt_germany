@@ -27,34 +27,34 @@ public class SkimCalculator {
     private static Logger log = Logger.getLogger(SkimCalculator.class);
 
     public static void main(String[] args) throws IOException {
-        String zonesShapeFilename = "./input/zones/zones_eu_skimCalculation.shp";
+        String zonesShapeFilename = "./input/zones/TAZs_completed_11879_skimCalculation.shp";
         String zonesIdAttributeName = "TAZ_id";
 
         Config config = ConfigUtils.loadConfig("./sbbConfigTest.xml");
         //RaptorUtils.createStaticConfig(config);
         //RaptorUtils.createParameters(config);
 
-        String mode = "ld_train_2";
+        String mode = "ld_bus_v3_";
 
         //for the v2
-        String outputDirectory = "./output/skims/germany_auto_2";
-        String networkFilename = "./output/eu_germany_network_w_connector.xml";
-        String transitScheduleFilename = "./output/ld_train_2/mapped_schedule.xml";
+        String outputDirectory = "./output/skims/ld_bus_v3";
+        String networkFilename = "./output/ld_bus_2/network_merged.xml.gz";
+        String transitScheduleFilename = "./output/ld_bus_2/mapped_schedule.xml";
 
 //        String outputDirectory = "./output/skims/germany_all_v1/";
 //        String networkFilename = "./output/opnv/network_merged_germany_bus.xml.gz";
 //        String transitScheduleFilename = "./output/opnv/schedule_germany_" + mode + "_mapped.xml";
 
-        MyCalculateSkimMatrices skims = new MyCalculateSkimMatrices(zonesShapeFilename, zonesIdAttributeName, outputDirectory, 16);
+        MyCalculateSkimMatrices skims = new MyCalculateSkimMatrices(zonesShapeFilename, zonesIdAttributeName, outputDirectory, 8);
         //skims.loadSamplingPointsFromFile("./input/centroids/meanStopsCSVModified.csv");
 
         //skims.calculateSamplingPointsPerZoneFromFacilities(facilitiesFilename, numberOfPointsPerZone, r, facility -> 1.0);
         // alternative if you don't have facilities:
         skims.calculateSamplingPointsPerZoneFromNetwork(networkFilename, 1, new Random(0));
-        double[] timesCar = new double[]{8 * 3600};
-        skims.calculateNetworkMatrices(networkFilename, null, timesCar, config, null, link -> true);
-        //skims.calculatePTMatrices(networkFilename, transitScheduleFilename, 8 * 60 * 60, 14 * 60 * 60, config,
-               // mode, (line, route) -> isRail(route));
+        //double[] timesCar = new double[]{8 * 3600};
+        //skims.calculateNetworkMatrices(networkFilename, null, timesCar, config, null, link -> true);
+        skims.calculatePTMatrices(networkFilename, transitScheduleFilename, 8 * 60 * 60, 8.1 * 60 * 60, config,
+                mode, (line, route) -> isCoach(route));
 
         //skims.calculateBeelineMatrix();
 
@@ -96,37 +96,6 @@ public class SkimCalculator {
         }
     }
 
-
-//    void calculateMyPtMAtrices (String networkFilename, String transitScheduleFilename, double startTime, double endTime, Config config, String outputPrefix, BiPredicate< TransitLine, TransitRoute> trainDetector) throws IOException {
-//            String prefix = outputPrefix == null ? "" : outputPrefix;
-//            Scenario scenario = ScenarioUtils.createScenario(config);
-//            log.info("loading schedule from " + transitScheduleFilename);
-//            new TransitScheduleReader(scenario).readFile(transitScheduleFilename);
-//            new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
-//
-//            log.info("prepare PT Matrix calculation");
-//            RaptorStaticConfig raptorConfig = RaptorUtils.createStaticConfig(config);
-//            raptorConfig.setOptimization(RaptorStaticConfig.RaptorOptimization.OneToAllRouting);
-//            SwissRailRaptorData raptorData = SwissRailRaptorData.create(scenario.getTransitSchedule(), raptorConfig, scenario.getNetwork());
-//            RaptorParameters raptorParameters = RaptorUtils.createParameters(config);
-//
-//
-//            log.info("calc PT matrices for " + Time.writeTime(startTime) + " - " + Time.writeTime(endTime));
-//            PTSkimMatrices.PtIndicators<String> matrices = PTSkimMatrices.calculateSkimMatrices(
-//                    raptorData, skims.zonesById, this.coordsPerZone, startTime, endTime, 120, raptorParameters, this.numberOfThreads, trainDetector);
-////
-////            log.info("write PT matrices to " + outputDirectory + (prefix.isEmpty() ? "" : (" with prefix " + prefix)));
-////            FloatMatrixIO.writeAsCSV(matrices.adaptionTimeMatrix, outputDirectory + "/" + prefix + PT_ADAPTIONTIMES_FILENAME);
-////            FloatMatrixIO.writeAsCSV(matrices.frequencyMatrix, outputDirectory + "/" + prefix + PT_FREQUENCIES_FILENAME);
-////            FloatMatrixIO.writeAsCSV(matrices.distanceMatrix, outputDirectory + "/" + prefix + PT_DISTANCES_FILENAME);
-////            FloatMatrixIO.writeAsCSV(matrices.travelTimeMatrix, outputDirectory + "/" + prefix + PT_TRAVELTIMES_FILENAME);
-////            FloatMatrixIO.writeAsCSV(matrices.accessTimeMatrix, outputDirectory + "/" + prefix + PT_ACCESSTIMES_FILENAME);
-////            FloatMatrixIO.writeAsCSV(matrices.egressTimeMatrix, outputDirectory + "/" + prefix + PT_EGRESSTIMES_FILENAME);
-////            FloatMatrixIO.writeAsCSV(matrices.transferCountMatrix, outputDirectory + "/" + prefix + PT_TRANSFERCOUNTS_FILENAME);
-////            FloatMatrixIO.writeAsCSV(matrices.trainTravelTimeShareMatrix, outputDirectory + "/" + prefix + PT_TRAINSHARE_BYTIME_FILENAME);
-////            FloatMatrixIO.writeAsCSV(matrices.trainDistanceShareMatrix, outputDirectory + "/" + prefix + PT_TRAINSHARE_BYDISTANCE_FILENAME);
-//        }
-//    }
 
 
 }

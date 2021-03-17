@@ -45,9 +45,9 @@ public class PTSurveyProcessor {
         String transitScheduleFilename = "./input/mapped_schedule.xml"; //"./input/schedule_germany_bus_mapped.xml";
         String transitVehiclesFilename = "./input/vehicles.xml"; //"./input/vehicle_germany_bus.xml";;
         String outputFolder =  "./output/train/";
-        String outputFileName = "est_train_trips_LD.csv";
+        String outputFileName = "added_bus_ld_times.csv";
         //String zoneFile = "./output/skims/germany_opnv_db_rb/zone_coordinates.csv"; //?
-        String fileName = "input/MATSim_LDTrips.csv";
+        String fileName = "./MATSim_LDTrips1.csv";
 
         Config config1 = configureMATSim();
         Scenario scenario = ScenarioUtils.loadScenario(config1);
@@ -101,7 +101,13 @@ public class PTSurveyProcessor {
         });*/
         TransitRouter transitRouter = new TransitRouterImpl(transitConfig, scenario.getTransitSchedule());
 
-        for (PTSurveyTrip trip : tripMap.values()){
+       // for (PTSurveyTrip trip : tripMap.values()){
+
+            for (int i =0; i< 50; i++){
+                PTSurveyTrip trip = tripMap.get(i);
+            //tripMap.values().parallelStream().forEach(trip ->{
+
+
             Facility fromFacility = ((ActivityFacilitiesFactory) activityFacilitiesFactory).createActivityFacility(Id.create(1, ActivityFacility.class),
                     trip.getOrigCoord());
             Facility toFacility = ((ActivityFacilitiesFactory) activityFacilitiesFactory).createActivityFacility(Id.create(2, ActivityFacility.class),
@@ -125,7 +131,7 @@ public class PTSurveyProcessor {
 
             String linesIds = "";
             String routesIds = "";
-            Network network = scenario.getNetwork();
+            //Network network = scenario.getNetwork();
             for (PlanElement pe : route) {
                 double this_leg_time = (((Leg) pe).getRoute().getTravelTime() / 60.);
                 double this_leg_distance = (((Leg) pe).getRoute().getDistance());
@@ -138,26 +144,29 @@ public class PTSurveyProcessor {
                     egress_dist_m += this_leg_distance;
                 } else if (((Leg) pe).getMode().equals("pt")) {
                     Route route1 = ((Leg) pe).getRoute();
+                    //commented to make it faster?
                     ExperimentalTransitRoute experimentalTransitRoute = (ExperimentalTransitRoute) route1;
                     String lineId = experimentalTransitRoute.getLineId().toString();
                     String routeId = experimentalTransitRoute.getRouteId().toString();
 
-                    linesIds += "-" + lineId;
-                    routesIds += "-" + routeId;
+                    linesIds += "===" + lineId;
+                    routesIds += "===" + routeId;
                     inVehicle += this_leg_time;
 
                     //distance += network.getLinks().get(Id.create(lineId, Link.class)).getLength();;
                     distance += this_leg_distance;
                     pt_legs++;
-                    transitTransfers =+1;
+                    transitTransfers++;
                 }
                 sequence++;
 
-                if(trip.getId() % 1000 == 0){
-                    System.out.println("Completed " + trip.getId() + " trips.");
-                }
 
             }
+
+            if(trip.getId() % 10 == 0){
+                logger.info("Completed " + trip.getId() + " trips.");
+            }
+
             float inTransitTime = sumTravelTime_min - access_min - egress_min;
             counter.incrementAndGet();
 
@@ -174,6 +183,7 @@ public class PTSurveyProcessor {
             trip.setRoutesIds(routesIds);
             trip.setBeelineDist(NetworkUtils.getEuclideanDistance(trip.getOrigCoord(), trip.getDestCoord()));
         }
+        //});
 
         //PrintWriter pw = new PrintWriter(new File(outputFolder + "skim.csv"));
         PrintWriter pw = new PrintWriter(new File(outputFileName));
@@ -211,12 +221,12 @@ public class PTSurveyProcessor {
     private static Config configureMATSim() {
 
         //String networkFilename = "./input/network_merged_germany_bus.xml.gz";
-        String networkFilename = "./input/network_merged.xml.gz";
+        String networkFilename = "C:\\models\\mito\\germanymodel\\network\\longDistanceBus/network_merged.xml.gz";
         //String transitScheduleFilename = "./input/schedule_germany_bus_mapped.xml";
-        String transitScheduleFilename = "./input/mapped_schedule.xml";
+        String transitScheduleFilename = "C:\\models\\mito\\germanymodel\\network\\longDistanceBus/mapped_schedule.xml";
         //String transitVehiclesFilename = "./input/vehicle_germany_bus.xml";
-        String transitVehiclesFilename = "./input/vehicles.xml";
-        String outputFolder =  "./output/train/";
+        String transitVehiclesFilename = "C:\\models\\mito\\germanymodel\\network\\longDistanceBus/vehicles.xml";
+        String outputFolder =  "";
         //String zoneFile = "./output/skims/germany_opnv_db_rb/zone_coordinates.csv"; //?
         //String fileName = "input/MiD_trips_with_coordinates.csv";
 

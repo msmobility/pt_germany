@@ -22,7 +22,11 @@ public class MyPtSkimMatrices {
     private MyPtSkimMatrices() {
     }
 
-    public static <T> MyPtSkimMatrices.PtIndicators<T> calculateSkimMatrices(SwissRailRaptorData raptorData, Map<T, SimpleFeature> zones, Map<T, Coord[]> coordsPerZone, double minDepartureTime, double maxDepartureTime, double stepSize_seconds, RaptorParameters parameters, int numberOfThreads, BiPredicate<TransitLine, TransitRoute> trainDetector) {
+    public static <T> MyPtSkimMatrices.PtIndicators<T> calculateSkimMatrices(SwissRailRaptorData raptorData,
+                                                                             Map<T, SimpleFeature> zones,
+                                                                             Map<T, Coord[]> coordsPerZone,
+                                                                             double minDepartureTime, double maxDepartureTime,
+                                                                             double stepSize_seconds, RaptorParameters parameters, int numberOfThreads, BiPredicate<TransitLine, TransitRoute> trainDetector) {
         // prepare calculation
         MyPtSkimMatrices.PtIndicators<T> pti = new MyPtSkimMatrices.PtIndicators<>(zones.keySet());
 
@@ -452,31 +456,30 @@ public class MyPtSkimMatrices {
     }
 
     public static class PtIndicators<T> {
-        public final FloatMatrix<T> adaptionTimeMatrix;
-        public final FloatMatrix<T> frequencyMatrix;
+        public final MyFloatMatrix<T> adaptionTimeMatrix;
+        public final MyFloatMatrix<T> frequencyMatrix;
 
-        public final FloatMatrix<T> distanceMatrix;
-        public final FloatMatrix<T> travelTimeMatrix;
-        public final FloatMatrix<T> accessTimeMatrix;
-        public final FloatMatrix<T> egressTimeMatrix;
-        public final FloatMatrix<T> transferCountMatrix;
-        public final FloatMatrix<T> trainTravelTimeShareMatrix;
-        public final FloatMatrix<T> trainDistanceShareMatrix;
+        public final MyFloatMatrix<T> distanceMatrix;
+        public final MyFloatMatrix<T> travelTimeMatrix;
+        public final MyFloatMatrix<T> accessTimeMatrix;
+        public final MyFloatMatrix<T> egressTimeMatrix;
+        public final MyFloatMatrix<T> transferCountMatrix;
+        public final MyFloatMatrix<T> trainTravelTimeShareMatrix;
+        public final MyFloatMatrix<T> trainDistanceShareMatrix;
 
-        public final FloatMatrix<T> dataCountMatrix; // how many values/routes were taken into account to calculate the averages
+        public final MyFloatMatrix<T> dataCountMatrix; // how many values/routes were taken into account to calculate the averages
 
         PtIndicators(Set<T> zones) {
-            this.adaptionTimeMatrix = new FloatMatrix<>(zones, 0);
-            this.frequencyMatrix = new FloatMatrix<>(zones, 0);
-
-            this.distanceMatrix = new FloatMatrix<>(zones, 0);
-            this.travelTimeMatrix = new FloatMatrix<>(zones, 0);
-            this.accessTimeMatrix = new FloatMatrix<>(zones, 0);
-            this.egressTimeMatrix = new FloatMatrix<>(zones, 0);
-            this.transferCountMatrix = new FloatMatrix<>(zones, 0);
-            this.dataCountMatrix = new FloatMatrix<>(zones, 0);
-            this.trainTravelTimeShareMatrix = new FloatMatrix<>(zones, 0);
-            this.trainDistanceShareMatrix = new FloatMatrix<>(zones, 0);
+            this.adaptionTimeMatrix = new MyFloatMatrix<>(zones, 0);
+            this.frequencyMatrix = new MyFloatMatrix<>(zones, 0);
+            this.distanceMatrix = new MyFloatMatrix<>(zones, 0);
+            this.travelTimeMatrix = new MyFloatMatrix<>(zones, 0);
+            this.accessTimeMatrix = new MyFloatMatrix<>(zones, 0);
+            this.egressTimeMatrix = new MyFloatMatrix<>(zones, 0);
+            this.transferCountMatrix = new MyFloatMatrix<>(zones, 0);
+            this.dataCountMatrix = new MyFloatMatrix<>(zones, 0);
+            this.trainTravelTimeShareMatrix = new MyFloatMatrix<>(zones, 0);
+            this.trainDistanceShareMatrix = new MyFloatMatrix<>(zones, 0);
         }
     }
 

@@ -5,6 +5,12 @@ import ch.sbb.matsim.routing.pt.raptor.RaptorParameters;
 import ch.sbb.matsim.routing.pt.raptor.RaptorStaticConfig;
 import ch.sbb.matsim.routing.pt.raptor.RaptorUtils;
 import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorData;
+import de.tum.bgu.msm.io.output.OmxMatrixWriter;
+import de.tum.bgu.msm.util.matrices.IndexedDoubleMatrix2D;
+import omx.OmxFile;
+import omx.OmxLookup;
+import omx.OmxMatrix;
+import omx.hdf5.OmxConstants;
 import org.apache.log4j.Logger;
 import org.locationtech.jts.geom.*;
 import org.locationtech.jts.index.SpatialIndex;
@@ -350,18 +356,67 @@ private static final Logger log = Logger.getLogger(MyCalculateSkimMatrices.class
                     raptorData, this.zonesById, this.coordsPerZone, startTime, endTime, 3600, raptorParameters, this.numberOfThreads, trainDetector);
 
             log.info("write PT matrices to " + outputDirectory + (prefix.isEmpty() ? "" : (" with prefix " + prefix)));
-            FloatMatrixIO.writeAsCSV(matrices.adaptionTimeMatrix, outputDirectory + "/" + prefix + PT_ADAPTIONTIMES_FILENAME);
-            FloatMatrixIO.writeAsCSV(matrices.frequencyMatrix, outputDirectory + "/" + prefix + PT_FREQUENCIES_FILENAME);
-            FloatMatrixIO.writeAsCSV(matrices.distanceMatrix, outputDirectory + "/" + prefix + PT_DISTANCES_FILENAME);
-            FloatMatrixIO.writeAsCSV(matrices.travelTimeMatrix, outputDirectory + "/" + prefix + PT_TRAVELTIMES_FILENAME);
-            FloatMatrixIO.writeAsCSV(matrices.accessTimeMatrix, outputDirectory + "/" + prefix + PT_ACCESSTIMES_FILENAME);
-            FloatMatrixIO.writeAsCSV(matrices.egressTimeMatrix, outputDirectory + "/" + prefix + PT_EGRESSTIMES_FILENAME);
-            FloatMatrixIO.writeAsCSV(matrices.transferCountMatrix, outputDirectory + "/" + prefix + PT_TRANSFERCOUNTS_FILENAME);
-            FloatMatrixIO.writeAsCSV(matrices.trainTravelTimeShareMatrix, outputDirectory + "/" + prefix + PT_TRAINSHARE_BYTIME_FILENAME);
-            FloatMatrixIO.writeAsCSV(matrices.trainDistanceShareMatrix, outputDirectory + "/" + prefix + PT_TRAINSHARE_BYDISTANCE_FILENAME);
+            MyFloatMatrixIO.writeAsCSV(matrices.adaptionTimeMatrix, outputDirectory + "/" + prefix + PT_ADAPTIONTIMES_FILENAME);
+            MyFloatMatrixIO.writeAsCSV(matrices.frequencyMatrix, outputDirectory + "/" + prefix + PT_FREQUENCIES_FILENAME);
+            MyFloatMatrixIO.writeAsCSV(matrices.distanceMatrix, outputDirectory + "/" + prefix + PT_DISTANCES_FILENAME);
+            MyFloatMatrixIO.writeAsCSV(matrices.travelTimeMatrix, outputDirectory + "/" + prefix + PT_TRAVELTIMES_FILENAME);
+            MyFloatMatrixIO.writeAsCSV(matrices.accessTimeMatrix, outputDirectory + "/" + prefix + PT_ACCESSTIMES_FILENAME);
+            MyFloatMatrixIO.writeAsCSV(matrices.egressTimeMatrix, outputDirectory + "/" + prefix + PT_EGRESSTIMES_FILENAME);
+            MyFloatMatrixIO.writeAsCSV(matrices.transferCountMatrix, outputDirectory + "/" + prefix + PT_TRANSFERCOUNTS_FILENAME);
+            MyFloatMatrixIO.writeAsCSV(matrices.trainTravelTimeShareMatrix, outputDirectory + "/" + prefix + PT_TRAINSHARE_BYTIME_FILENAME);
+            MyFloatMatrixIO.writeAsCSV(matrices.trainDistanceShareMatrix, outputDirectory + "/" + prefix + PT_TRAINSHARE_BYDISTANCE_FILENAME);
+
+            String omxFilePath = outputDirectory + "/" + prefix + "matrices.omx";
+            OmxMatrixWriter.createOmxFile(omxFilePath, zones.size());
+
+            createOmxSkimMatrixFromFloatMatrix(matrices.adaptionTimeMatrix, zones, omxFilePath, "adaption_time_s");
+            createOmxSkimMatrixFromFloatMatrix(matrices.frequencyMatrix, zones, omxFilePath, "frequency");
+            createOmxSkimMatrixFromFloatMatrix(matrices.distanceMatrix, zones, omxFilePath, "distance_m");
+            createOmxSkimMatrixFromFloatMatrix(matrices.travelTimeMatrix, zones, omxFilePath, "travel_time_s");
+            createOmxSkimMatrixFromFloatMatrix(matrices.accessTimeMatrix, zones, omxFilePath, "access_time_s");
+            createOmxSkimMatrixFromFloatMatrix(matrices.egressTimeMatrix, zones, omxFilePath, "egress_time_s");
+            createOmxSkimMatrixFromFloatMatrix(matrices.transferCountMatrix, zones, omxFilePath, "transfer_count");
+            createOmxSkimMatrixFromFloatMatrix(matrices.trainTravelTimeShareMatrix, zones, omxFilePath, "train_time_share");
+            createOmxSkimMatrixFromFloatMatrix(matrices.trainDistanceShareMatrix, zones, omxFilePath, "train_distance_share");
+
         }
 
-        private static <T> void combineMatrices(MyFloatMatrix<T> matrix1, MyFloatMatrix<T> matrix2) {
+    private static void createOmxSkimMatrixFromFloatMatrix(MyFloatMatrix<String> matrix, Collection<SimpleFeature> zones, String omxFilePath, String name) {
+        try (OmxFile omxFile = new OmxFile(omxFilePath)) {
+            omxFile.openReadWrite();
+            double mat1NA = -1;
+
+            int dimension = zones.size();
+
+            double[][] array = new double[dimension][dimension];
+            int[] indices = new int[dimension];
+            Map<String, Integer> id2index = matrix.id2index;
+
+            for (String origin : id2index.keySet()){
+                try{
+                    indices[id2index.get(origin)] = Integer.valueOf(origin);
+                } catch (NumberFormatException e){
+                    System.out.println("Conversion to omx only works with zone integer IDs");
+                }
+                for (String destination : id2index.keySet()){
+                    array[id2index.get(origin)][id2index.get(destination)] = matrix.get(origin, destination);
+                }
+            }
+
+            OmxLookup lookup = new OmxLookup.OmxIntLookup("zone", indices, -1);
+            OmxMatrix.OmxDoubleMatrix mat1 = new OmxMatrix.OmxDoubleMatrix(name, array, mat1NA);
+            mat1.setAttribute(OmxConstants.OmxNames.OMX_DATASET_TITLE_KEY.getKey(), "skim_matrix");
+            omxFile.addMatrix(mat1);
+            omxFile.addLookup(lookup);
+            omxFile.save();
+            System.out.println(omxFile.summary());
+            omxFile.close();
+            System.out.println(name + "matrix written");
+        }
+    }
+
+
+    private static <T> void combineMatrices(MyFloatMatrix<T> matrix1, MyFloatMatrix<T> matrix2) {
             Set<T> ids = matrix2.id2index.keySet();
             for (T fromId : ids) {
                 for (T toId : ids) {
