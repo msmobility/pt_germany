@@ -6,7 +6,6 @@ import ch.sbb.matsim.routing.pt.raptor.RaptorStaticConfig;
 import ch.sbb.matsim.routing.pt.raptor.RaptorUtils;
 import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorData;
 import de.tum.bgu.msm.io.output.OmxMatrixWriter;
-import de.tum.bgu.msm.util.matrices.IndexedDoubleMatrix2D;
 import omx.OmxFile;
 import omx.OmxLookup;
 import omx.OmxMatrix;
@@ -369,26 +368,26 @@ private static final Logger log = Logger.getLogger(MyCalculateSkimMatrices.class
             String omxFilePath = outputDirectory + "/" + prefix + "matrices.omx";
             OmxMatrixWriter.createOmxFile(omxFilePath, zones.size());
 
-            createOmxSkimMatrixFromFloatMatrix(matrices.adaptionTimeMatrix, zones, omxFilePath, "adaption_time_s");
-            createOmxSkimMatrixFromFloatMatrix(matrices.frequencyMatrix, zones, omxFilePath, "frequency");
-            createOmxSkimMatrixFromFloatMatrix(matrices.distanceMatrix, zones, omxFilePath, "distance_m");
-            createOmxSkimMatrixFromFloatMatrix(matrices.travelTimeMatrix, zones, omxFilePath, "travel_time_s");
-            createOmxSkimMatrixFromFloatMatrix(matrices.accessTimeMatrix, zones, omxFilePath, "access_time_s");
-            createOmxSkimMatrixFromFloatMatrix(matrices.egressTimeMatrix, zones, omxFilePath, "egress_time_s");
-            createOmxSkimMatrixFromFloatMatrix(matrices.transferCountMatrix, zones, omxFilePath, "transfer_count");
-            createOmxSkimMatrixFromFloatMatrix(matrices.trainTravelTimeShareMatrix, zones, omxFilePath, "train_time_share");
-            createOmxSkimMatrixFromFloatMatrix(matrices.trainDistanceShareMatrix, zones, omxFilePath, "train_distance_share");
+            createIntOmxSkimMatrixFromFloatMatrix(matrices.adaptionTimeMatrix, zones, omxFilePath, "adaption_time_s");
+            createFloatOmxSkimMatrixFromFloatMatrix(matrices.frequencyMatrix, zones, omxFilePath, "frequency");
+            createIntOmxSkimMatrixFromFloatMatrix(matrices.distanceMatrix, zones, omxFilePath, "distance_m");
+            createIntOmxSkimMatrixFromFloatMatrix(matrices.travelTimeMatrix, zones, omxFilePath, "travel_time_s");
+            createIntOmxSkimMatrixFromFloatMatrix(matrices.accessTimeMatrix, zones, omxFilePath, "access_time_s");
+            createIntOmxSkimMatrixFromFloatMatrix(matrices.egressTimeMatrix, zones, omxFilePath, "egress_time_s");
+            createFloatOmxSkimMatrixFromFloatMatrix(matrices.transferCountMatrix, zones, omxFilePath, "transfer_count");
+            createFloatOmxSkimMatrixFromFloatMatrix(matrices.trainTravelTimeShareMatrix, zones, omxFilePath, "train_time_share");
+            createFloatOmxSkimMatrixFromFloatMatrix(matrices.trainDistanceShareMatrix, zones, omxFilePath, "train_distance_share");
 
         }
 
-    private static void createOmxSkimMatrixFromFloatMatrix(MyFloatMatrix<String> matrix, Collection<SimpleFeature> zones, String omxFilePath, String name) {
+    private static void createIntOmxSkimMatrixFromFloatMatrix(MyFloatMatrix<String> matrix, Collection<SimpleFeature> zones, String omxFilePath, String name) {
         try (OmxFile omxFile = new OmxFile(omxFilePath)) {
             omxFile.openReadWrite();
-            double mat1NA = -1;
+            int mat1NA = -1;
 
             int dimension = zones.size();
 
-            double[][] array = new double[dimension][dimension];
+            int[][] array = new int[dimension][dimension];
             int[] indices = new int[dimension];
             Map<String, Integer> id2index = matrix.id2index;
 
@@ -399,12 +398,46 @@ private static final Logger log = Logger.getLogger(MyCalculateSkimMatrices.class
                     System.out.println("Conversion to omx only works with zone integer IDs");
                 }
                 for (String destination : id2index.keySet()){
-                    array[id2index.get(origin)][id2index.get(destination)] = matrix.get(origin, destination);
+                    array[id2index.get(origin)][id2index.get(destination)] = (int) matrix.get(origin, destination);
                 }
             }
 
             OmxLookup lookup = new OmxLookup.OmxIntLookup("zone", indices, -1);
-            OmxMatrix.OmxDoubleMatrix mat1 = new OmxMatrix.OmxDoubleMatrix(name, array, mat1NA);
+            OmxMatrix.OmxIntMatrix mat1 = new OmxMatrix.OmxIntMatrix(name, array, mat1NA);
+            mat1.setAttribute(OmxConstants.OmxNames.OMX_DATASET_TITLE_KEY.getKey(), "skim_matrix");
+            omxFile.addMatrix(mat1);
+            omxFile.addLookup(lookup);
+            omxFile.save();
+            System.out.println(omxFile.summary());
+            omxFile.close();
+            System.out.println(name + "matrix written");
+        }
+    }
+
+    private static void createFloatOmxSkimMatrixFromFloatMatrix(MyFloatMatrix<String> matrix, Collection<SimpleFeature> zones, String omxFilePath, String name) {
+        try (OmxFile omxFile = new OmxFile(omxFilePath)) {
+            omxFile.openReadWrite();
+            float mat1NA = -1;
+
+            int dimension = zones.size();
+
+            float[][] array = new float[dimension][dimension];
+            int[] indices = new int[dimension];
+            Map<String, Integer> id2index = matrix.id2index;
+
+            for (String origin : id2index.keySet()){
+                try{
+                    indices[id2index.get(origin)] = Integer.valueOf(origin);
+                } catch (NumberFormatException e){
+                    System.out.println("Conversion to omx only works with zone integer IDs");
+                }
+                for (String destination : id2index.keySet()){
+                    array[id2index.get(origin)][id2index.get(destination)] = (int) matrix.get(origin, destination);
+                }
+            }
+
+            OmxLookup lookup = new OmxLookup.OmxIntLookup("zone", indices, -1);
+            OmxMatrix.OmxFloatMatrix mat1 = new OmxMatrix.OmxFloatMatrix(name, array, mat1NA);
             mat1.setAttribute(OmxConstants.OmxNames.OMX_DATASET_TITLE_KEY.getKey(), "skim_matrix");
             omxFile.addMatrix(mat1);
             omxFile.addLookup(lookup);

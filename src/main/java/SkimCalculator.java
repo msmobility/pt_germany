@@ -34,12 +34,12 @@ public class SkimCalculator {
         //RaptorUtils.createStaticConfig(config);
         //RaptorUtils.createParameters(config);
 
-        String mode = "ld_bus_v3_";
+        String mode = "ld_train_v4_";
 
         //for the v2
-        String outputDirectory = "./output/skims/ld_bus_v3";
-        String networkFilename = "./output/ld_bus_2/network_merged.xml.gz";
-        String transitScheduleFilename = "./output/ld_bus_2/mapped_schedule.xml";
+        String outputDirectory = "./output/skims/ld_train_v4";
+        String networkFilename = "./output/ld_train_2/network_merged.xml.gz";
+        String transitScheduleFilename = "./output/ld_train_2/mapped_schedule.xml";
 
 //        String outputDirectory = "./output/skims/germany_all_v1/";
 //        String networkFilename = "./output/opnv/network_merged_germany_bus.xml.gz";
