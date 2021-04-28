@@ -307,6 +307,68 @@ private static final Logger log = Logger.getLogger(MyCalculateSkimMatrices.class
             MyFloatMatrixIO.writeAsCSV(netIndicators.distanceMatrix, outputDirectory + "/" + prefix + CAR_DISTANCES_FILENAME);
         }
 
+    public final void calculateNetworkMatricesWithTolls(String networkFilename, String eventsFilename, double[] times, Config config, String outputPrefix, Predicate<Link> xy2linksPredicate) throws IOException {
+        String prefix = outputPrefix == null ? "" : outputPrefix;
+        Scenario scenario = ScenarioUtils.createScenario(config);
+        log.info("loading network from " + networkFilename);
+        new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
+
+        TravelTime tt;
+        if (eventsFilename != null) {
+            log.info("extracting actual travel times from " + eventsFilename);
+            TravelTimeCalculator ttc = TravelTimeCalculator.create(scenario.getNetwork(),config.travelTimeCalculator());
+            EventsManager events = EventsUtils.createEventsManager();
+            events.addHandler(ttc);
+            new MatsimEventsReader(events).readFile(eventsFilename);
+            tt = ttc.getLinkTravelTimes();
+        } else {
+            tt = new FreeSpeedTravelTime();
+            log.info("No events specified. Travel Times will be calculated with free speed travel times.");
+        }
+
+        TravelDisutility td = new OnlyTimeDependentTravelDisutility(tt);
+
+        log.info("extracting car-only network");
+        final Network carNetwork = NetworkUtils.createNetwork();
+        new TransportModeNetworkFilter(scenario.getNetwork()).filter(carNetwork, Collections.singleton(TransportMode.car));
+
+        log.info("filter car-only network for assigning links to locations");
+        final Network xy2linksNetwork = extractXy2LinksNetwork(carNetwork, xy2linksPredicate);
+
+        log.info("calc CAR matrix for " + Time.writeTime(times[0]));
+        MyNetworkSkimMatrices.NetworkIndicators<String> netIndicators = MyNetworkSkimMatrices.calculateSkimMatrices(
+                xy2linksNetwork, carNetwork, zonesById, coordsPerZone, times[0], tt, td, this.numberOfThreads);
+
+        if (tt instanceof FreeSpeedTravelTime) {
+            log.info("Do not calculate CAR matrices for other times as only freespeed is being used");
+        } else {
+            for (int i = 1; i < times.length; i++) {
+                log.info("calc CAR matrices for " + Time.writeTime(times[i]));
+                MyNetworkSkimMatrices.NetworkIndicators<String> indicators2 = MyNetworkSkimMatrices.calculateSkimMatrices(
+                        xy2linksNetwork, carNetwork, zonesById, coordsPerZone, times[i], tt, td, this.numberOfThreads);
+                log.info("merge CAR matrices for " + Time.writeTime(times[i]));
+                combineMatrices(netIndicators.travelTimeMatrix, indicators2.travelTimeMatrix);
+                combineMatrices(netIndicators.distanceMatrix, indicators2.distanceMatrix);
+                combineMatrices(netIndicators.distanceMatrix, indicators2.tollDistanceMatrix);
+            }
+            log.info("re-scale CAR matrices after all data is merged.");
+            netIndicators.travelTimeMatrix.multiply((float) (1.0 / times.length));
+            netIndicators.distanceMatrix.multiply((float) (1.0 / times.length));
+            netIndicators.tollDistanceMatrix.multiply((float) (1.0 / times.length));
+        }
+
+        log.info("write CAR matrices to " + outputDirectory + (prefix.isEmpty() ? "" : (" with prefix " + prefix)));
+        MyFloatMatrixIO.writeAsCSV(netIndicators.travelTimeMatrix, outputDirectory + "/" + prefix + CAR_TRAVELTIMES_FILENAME);
+        MyFloatMatrixIO.writeAsCSV(netIndicators.distanceMatrix, outputDirectory + "/" + prefix + CAR_DISTANCES_FILENAME);
+        MyFloatMatrixIO.writeAsCSV(netIndicators.tollDistanceMatrix, outputDirectory + "/" + prefix + "toll_distances.csv.gz");
+
+        String omxFilePath = outputDirectory + "/" + "car_matrix.omx";
+        OmxMatrixWriter.createOmxFile(omxFilePath, zones.size());
+        createFloatOmxSkimMatrixFromFloatMatrix(netIndicators.tollDistanceMatrix, zones, omxFilePath, "tollDistance_m");
+        createFloatOmxSkimMatrixFromFloatMatrix(netIndicators.distanceMatrix, zones, omxFilePath, "distance_m");
+        createFloatOmxSkimMatrixFromFloatMatrix(netIndicators.travelTimeMatrix, zones, omxFilePath, "time_s");
+    }
+
         private Network extractXy2LinksNetwork(Network network, Predicate<Link> xy2linksPredicate) {
             Network xy2lNetwork = NetworkUtils.createNetwork();
             NetworkFactory nf = xy2lNetwork.getFactory();
@@ -368,12 +430,12 @@ private static final Logger log = Logger.getLogger(MyCalculateSkimMatrices.class
             String omxFilePath = outputDirectory + "/" + prefix + "matrices.omx";
             OmxMatrixWriter.createOmxFile(omxFilePath, zones.size());
 
-            createIntOmxSkimMatrixFromFloatMatrix(matrices.adaptionTimeMatrix, zones, omxFilePath, "adaption_time_s");
+            createFloatOmxSkimMatrixFromFloatMatrix(matrices.adaptionTimeMatrix, zones, omxFilePath, "adaption_time_s");
             createFloatOmxSkimMatrixFromFloatMatrix(matrices.frequencyMatrix, zones, omxFilePath, "frequency");
-            createIntOmxSkimMatrixFromFloatMatrix(matrices.distanceMatrix, zones, omxFilePath, "distance_m");
-            createIntOmxSkimMatrixFromFloatMatrix(matrices.travelTimeMatrix, zones, omxFilePath, "travel_time_s");
-            createIntOmxSkimMatrixFromFloatMatrix(matrices.accessTimeMatrix, zones, omxFilePath, "access_time_s");
-            createIntOmxSkimMatrixFromFloatMatrix(matrices.egressTimeMatrix, zones, omxFilePath, "egress_time_s");
+            createFloatOmxSkimMatrixFromFloatMatrix(matrices.distanceMatrix, zones, omxFilePath, "distance_m");
+            createFloatOmxSkimMatrixFromFloatMatrix(matrices.travelTimeMatrix, zones, omxFilePath, "travel_time_s");
+            createFloatOmxSkimMatrixFromFloatMatrix(matrices.accessTimeMatrix, zones, omxFilePath, "access_time_s");
+            createFloatOmxSkimMatrixFromFloatMatrix(matrices.egressTimeMatrix, zones, omxFilePath, "egress_time_s");
             createFloatOmxSkimMatrixFromFloatMatrix(matrices.transferCountMatrix, zones, omxFilePath, "transfer_count");
             createFloatOmxSkimMatrixFromFloatMatrix(matrices.trainTravelTimeShareMatrix, zones, omxFilePath, "train_time_share");
             createFloatOmxSkimMatrixFromFloatMatrix(matrices.trainDistanceShareMatrix, zones, omxFilePath, "train_distance_share");

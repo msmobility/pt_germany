@@ -1,8 +1,6 @@
 package skimCalculator;
 
-import ch.sbb.matsim.analysis.skims.FloatMatrix;
 import ch.sbb.matsim.analysis.skims.LeastCostPathTree;
-import ch.sbb.matsim.analysis.skims.NetworkSkimMatrices;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -94,7 +92,7 @@ public class MyNetworkSkimMatrices {
         }
 
         public void run() {
-            LeastCostPathTree lcpTree = new LeastCostPathTree(this.travelTime, this.travelDisutility);
+            LeastCostPathTreeWithTolls lcpTree = new LeastCostPathTreeWithTolls(this.travelTime, this.travelDisutility);
             while (true) {
                 T fromZoneId = this.originZones.poll();
                 if (fromZoneId == null) {
@@ -111,16 +109,19 @@ public class MyNetworkSkimMatrices {
                             Node[] toNodes = this.nodesPerZone.get(toZoneId);
                             if (toNodes != null) {
                                 for (Node toNode : toNodes) {
-                                    LeastCostPathTree.NodeData data = lcpTree.getTree().get(toNode.getId());
+                                    LeastCostPathTreeWithTolls.NodeData data = lcpTree.getTree().get(toNode.getId());
                                     double tt = data.getTime() - this.departureTime;
                                     double dist = data.getDistance();
+                                    double tollDistance = data.getDistanceWithTolls();
                                     this.networkIndicators.travelTimeMatrix.add(fromZoneId, toZoneId, (float) tt);
                                     this.networkIndicators.distanceMatrix.add(fromZoneId, toZoneId, (float) dist);
+                                    this.networkIndicators.tollDistanceMatrix.add(fromZoneId, toZoneId, (float) tollDistance);
                                 }
                             } else {
                                 // this might happen if a zone has no geometry, for whatever reason...
                                 this.networkIndicators.travelTimeMatrix.set(fromZoneId, toZoneId, Float.POSITIVE_INFINITY);
                                 this.networkIndicators.distanceMatrix.set(fromZoneId, toZoneId, Float.POSITIVE_INFINITY);
+                                this.networkIndicators.tollDistanceMatrix.set(fromZoneId, toZoneId, Float.POSITIVE_INFINITY);
                             }
                         }
                     }
@@ -129,6 +130,7 @@ public class MyNetworkSkimMatrices {
                     for (T toZoneId : this.destinationZones) {
                         this.networkIndicators.travelTimeMatrix.set(fromZoneId, toZoneId, Float.POSITIVE_INFINITY);
                         this.networkIndicators.distanceMatrix.set(fromZoneId, toZoneId, Float.POSITIVE_INFINITY);
+                        this.networkIndicators.tollDistanceMatrix.set(fromZoneId, toZoneId, Float.POSITIVE_INFINITY);
                     }
                 }
             }
@@ -138,10 +140,12 @@ public class MyNetworkSkimMatrices {
     static class NetworkIndicators<T> {
         final MyFloatMatrix<T> travelTimeMatrix;
         final MyFloatMatrix<T> distanceMatrix;
+        final MyFloatMatrix<T> tollDistanceMatrix;
 
         NetworkIndicators(Set<T> zones) {
             this.travelTimeMatrix = new MyFloatMatrix<>(zones, 0);
             this.distanceMatrix = new MyFloatMatrix<>(zones, 0);
+            this.tollDistanceMatrix = new MyFloatMatrix<>(zones, 0);
         }
     }
 

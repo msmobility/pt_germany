@@ -1,25 +1,12 @@
-import ch.sbb.matsim.analysis.skims.CalculateSkimMatrices;
-import ch.sbb.matsim.analysis.skims.FloatMatrixIO;
-import ch.sbb.matsim.analysis.skims.PTSkimMatrices;
-import ch.sbb.matsim.routing.pt.raptor.RaptorParameters;
-import ch.sbb.matsim.routing.pt.raptor.RaptorStaticConfig;
-import ch.sbb.matsim.routing.pt.raptor.RaptorUtils;
-import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorData;
+package skimCalculator;
+
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.io.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
-import skimCalculator.MyCalculateSkimMatrices;
 
 import java.io.IOException;
 import java.util.Random;
-import java.util.function.BiPredicate;
 
 
 public class SkimCalculator {
