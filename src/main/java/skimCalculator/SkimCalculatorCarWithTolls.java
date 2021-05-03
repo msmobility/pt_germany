@@ -19,7 +19,7 @@ public class SkimCalculatorCarWithTolls {
 
         Config config = ConfigUtils.loadConfig("./sbbConfigTest.xml");
 
-        String outputDirectory = "./output/skims/carWithToll";
+        String outputDirectory = "./output/skims/carWithoutToll";
         String networkFilename = "./input/road_networks/eu_germany_network_w_connector.xml.gz";
 
         MyCalculateSkimMatrices skims = new MyCalculateSkimMatrices(zonesShapeFilename, zonesIdAttributeName, outputDirectory, 16);

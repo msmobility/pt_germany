@@ -34,7 +34,7 @@ public class TollUtils {
             @Override
             public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle vehicle) {
                 if (hasToll(link)){
-                    return Double.POSITIVE_INFINITY;
+                    return link.getLength()/0.0001;
                 } else {
                     return  thisTravelTime.getLinkTravelTime(link, time, person, vehicle);
                 }

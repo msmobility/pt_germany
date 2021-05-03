@@ -326,7 +326,8 @@ private static final Logger log = Logger.getLogger(MyCalculateSkimMatrices.class
             log.info("No events specified. Travel Times will be calculated with free speed travel times.");
         }
 
-        TravelDisutility td = new OnlyTimeDependentTravelDisutility(tt);
+        //change here to avoid tolls or not
+        TravelDisutility td = TollUtils.getTravelDisutilityToAvoidTolls(tt);
 
         log.info("extracting car-only network");
         final Network carNetwork = NetworkUtils.createNetwork();

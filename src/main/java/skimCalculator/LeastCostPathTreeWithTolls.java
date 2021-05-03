@@ -173,6 +173,7 @@ public class LeastCostPathTreeWithTolls {
         double currTime = nData.getTime();
         double currCost = nData.getCost();
         double currDistance = nData.distance;
+        double currDistanceToll = nData.distanceWithTolls;
         for (Link l : n.getOutLinks().values()) {
             Node nn = l.getToNode();
             NodeData nnData = nodeData.get(nn.getId());
@@ -183,7 +184,7 @@ public class LeastCostPathTreeWithTolls {
             double visitCost = currCost + tcFunction.getLinkTravelDisutility(l, currTime, PERSON, VEHICLE);
             double visitTime = currTime + ttFunction.getLinkTravelTime(l, currTime, PERSON, VEHICLE);
             double distance = currDistance + l.getLength();
-            double distanceWithToll = TollUtils.hasToll(l)? l.getLength() : 0;
+            double distanceWithToll = currDistanceToll + (TollUtils.hasToll(l)? l.getLength() : 0);
 
             if (visitCost < nnData.getCost()) {
                 pendingNodes.remove(nn);
