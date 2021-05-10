@@ -8,7 +8,7 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.Random;
 
-public class ExtendBusNetwork {
+public class ExtractModeVariablesFromOMXToCSV {
 
     String inputMatrixCarDistance = "c:/models/germanymodel/skims/car_11717_travelDistance_m_w_connect.omx";
     String inputMatrixCarTime = "c:/models/germanymodel/skims/car_11717_travelTime_sec.omx";
@@ -24,7 +24,7 @@ public class ExtendBusNetwork {
 
     public static void main(String[] args) throws FileNotFoundException {
 
-        ExtendBusNetwork ebn = new ExtendBusNetwork();
+        ExtractModeVariablesFromOMXToCSV ebn = new ExtractModeVariablesFromOMXToCSV();
         ebn.readInput();
         ebn.runAnalysis(0.01, "c:/projects/bast_entlastung/analysis/ld_model_analysis/scenarios/extendedBusNetworkCurrentSpeeds.csv");
 

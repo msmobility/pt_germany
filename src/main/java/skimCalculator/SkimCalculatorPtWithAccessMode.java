@@ -9,39 +9,28 @@ import java.io.IOException;
 import java.util.Random;
 
 
-public class SkimCalculator {
+public class SkimCalculatorPtWithAccessMode {
 
-    private static Logger log = Logger.getLogger(SkimCalculator.class);
+    private static Logger log = Logger.getLogger(SkimCalculatorPtWithAccessMode.class);
 
     public static void main(String[] args) throws IOException {
+
         String zonesShapeFilename = "./input/zones/TAZs_completed_11879_skimCalculation.shp";
         String zonesIdAttributeName = "TAZ_id";
 
         Config config = ConfigUtils.loadConfig("./sbbConfigTest.xml");
-        //RaptorUtils.createStaticConfig(config);
-        //RaptorUtils.createParameters(config);
 
-        String mode = "ld_train_v4_";
+        String mode = "ld_train_with_auto_access";
 
-        //for the v2
-        String outputDirectory = "./output/skims/ld_train_v4";
-        String networkFilename = "./output/db/network_merged.xml.gz";
-        String transitScheduleFilename = "./output/db/mapped_schedule.xml";
 
-//        String outputDirectory = "./output/skims/germany_all_v1/";
-//        String networkFilename = "./output/opnv/network_merged_germany_bus.xml.gz";
-//        String transitScheduleFilename = "./output/opnv/schedule_germany_" + mode + "_mapped.xml";
+        String outputDirectory = "./output/skims/ld_train_with_auto_access";
+        String networkFilename = "./output/ld_train_2/network_merged.xml.gz";
+        String transitScheduleFilename = "./output/ld_train_2/mapped_schedule.xml";
 
-        MyCalculateSkimMatrices skims = new MyCalculateSkimMatrices(zonesShapeFilename, zonesIdAttributeName, outputDirectory, 8);
-        //skims.loadSamplingPointsFromFile("./input/centroids/meanStopsCSVModified.csv");
-
-        //skims.calculateSamplingPointsPerZoneFromFacilities(facilitiesFilename, numberOfPointsPerZone, r, facility -> 1.0);
-        // alternative if you don't have facilities:
-        skims.calculateSamplingPointsPerZoneFromNetwork(networkFilename, 1, new Random(0));
-        //double[] timesCar = new double[]{8 * 3600};
-        //skims.calculateNetworkMatrices(networkFilename, null, timesCar, config, null, link -> true);
+        MyCalculateSkimMatricesWithAccessMode skims = new MyCalculateSkimMatricesWithAccessMode(zonesShapeFilename, zonesIdAttributeName, outputDirectory, 8);
+        skims.loadSamplingPointsFromFile("output/skims/ld_train_v3/zone_coordinates.csv");
         skims.calculatePTMatrices(networkFilename, transitScheduleFilename, 8 * 60 * 60, 8.1 * 60 * 60, config,
-                mode, (line, route) -> isCoach(route));
+                mode, (line, route) -> isRail(route));
 
         //skims.calculateBeelineMatrix();
 
