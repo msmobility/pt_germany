@@ -20,10 +20,10 @@ public class SkimCalculatorPtWithAccessMode {
 
         Config config = ConfigUtils.loadConfig("./sbbConfigTest.xml");
 
-        String mode = "ld_train_with_auto_access";
+        String mode = "ld_train_with_auto_access_2";
 
 
-        String outputDirectory = "./output/skims/ld_train_with_auto_access";
+        String outputDirectory = "./output/skims/ld_train_with_auto_access_2";
         String networkFilename = "./output/ld_train_2/network_merged.xml.gz";
         String transitScheduleFilename = "./output/ld_train_2/mapped_schedule.xml";
 

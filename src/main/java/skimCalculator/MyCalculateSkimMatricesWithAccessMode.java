@@ -80,8 +80,9 @@ private static final Logger log = Logger.getLogger(MyCalculateSkimMatricesWithAc
         public static final String ZONE_LOCATIONS_FILENAME = "zone_coordinates.csv";
 
         private final static GeometryFactory GEOMETRY_FACTORY = new GeometryFactory();
+        private static final String PT_ACCESS_STATION_COORDINATES = "access_station_coordinates.csv.gz";
 
-        private final Collection<SimpleFeature> zones;
+    private final Collection<SimpleFeature> zones;
         private final Map<String, SimpleFeature> zonesById;
         private final String zonesIdAttributeName;
         private final SpatialIndex zonesQt;
@@ -430,6 +431,9 @@ private static final Logger log = Logger.getLogger(MyCalculateSkimMatricesWithAc
             MyFloatMatrixIO.writeAsCSV(matrices.trainTravelTimeShareMatrix, outputDirectory + "/" + prefix + PT_TRAINSHARE_BYTIME_FILENAME);
             MyFloatMatrixIO.writeAsCSV(matrices.trainDistanceShareMatrix, outputDirectory + "/" + prefix + PT_TRAINSHARE_BYDISTANCE_FILENAME);
 
+
+
+
             String omxFilePath = outputDirectory + "/" + prefix + "matrices.omx";
             OmxMatrixWriter.createOmxFile(omxFilePath, zones.size());
 
@@ -443,7 +447,46 @@ private static final Logger log = Logger.getLogger(MyCalculateSkimMatricesWithAc
             createFloatOmxSkimMatrixFromFloatMatrix(matrices.trainTravelTimeShareMatrix, zones, omxFilePath, "train_time_share");
             createFloatOmxSkimMatrixFromFloatMatrix(matrices.trainDistanceShareMatrix, zones, omxFilePath, "train_distance_share");
 
+            writeCoordinatesOfAccess(matrices.coordinatesOfAccessStation, outputDirectory + "/" + prefix + PT_ACCESS_STATION_COORDINATES);
+
         }
+
+    private static void writeCoordinatesOfAccess(Map<String, Map<String, Coord>> coordinatesOfAccessStation, String filename) {
+        String NL = "\n";
+        String HEADER = "FROM,TO,X_ACCESS,Y_ACCESS";
+        String SEP = ",";
+
+        try (BufferedWriter writer = IOUtils.getBufferedWriter(filename)) {
+            writer.write(HEADER);
+                writer.write(NL);
+                String[] zoneIds = coordinatesOfAccessStation.keySet().toArray(new String[0]);
+                for (String fromZoneId : zoneIds) {
+                    for (String toZoneId : zoneIds) {
+                        writer.write(fromZoneId.toString());
+                        writer.append(SEP);
+                        writer.write(toZoneId.toString());
+                        writer.append(SEP);
+                        Coord coord  = coordinatesOfAccessStation.get(fromZoneId).get(toZoneId);
+                        if (coord != null) {
+                            writer.write(String.valueOf(Math.round(coord.getX())));
+                            writer.append(SEP);
+                            writer.write(String.valueOf(Math.round(coord.getY())));
+                            writer.append(NL);
+                        } else {
+                            writer.write("-1");
+                            writer.append(SEP);
+                            writer.write("-1");
+                            writer.append(NL);
+                        }
+                    }
+                }
+                writer.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+    }
 
     private static void createIntOmxSkimMatrixFromFloatMatrix(MyFloatMatrix<String> matrix, Collection<SimpleFeature> zones, String omxFilePath, String name) {
         try (OmxFile omxFile = new OmxFile(omxFilePath)) {

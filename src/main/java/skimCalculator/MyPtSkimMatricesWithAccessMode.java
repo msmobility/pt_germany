@@ -35,6 +35,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static skimCalculator.MyCalculateSkimMatricesWithAccessMode.extractXy2LinksNetwork;
 
@@ -193,10 +194,10 @@ public class MyPtSkimMatricesWithAccessMode {
             for (TransitStopFacility stop : fromStops) {
                 double distance;
                 double accessTime;
-                LeastCostPathTree.NodeData nodeData = treeAtOrigin.getTree().get(NetworkUtils.getNearestNode(carNetwork, stop.getCoord()));
+                LeastCostPathTree.NodeData nodeData = treeAtOrigin.getTree().get(NetworkUtils.getNearestNode(carNetwork, stop.getCoord()).getId());
                 if (nodeData != null){
                     //distance = nodeData.getDistance();
-                    accessTime = nodeData.getTime();
+                    accessTime = nodeData.getTime() - 8*3600;
                 } else {
                     distance = CoordUtils.calcEuclideanDistance(stop.getCoord(), fromCoord);
                     accessTime = distance / walkSpeed;
@@ -215,14 +216,15 @@ public class MyPtSkimMatricesWithAccessMode {
                 Coord[] toCoords = this.coordsPerZone.get(toZoneId);
                 if (toCoords != null) {
                     for (Coord toCoord : toCoords) {
-                        calcForOD(fromZoneId, fromCoord, toZoneId, toCoord, accessTimes, trees);
+                        calcForOD(fromZoneId, fromCoord, toZoneId, toCoord, accessTimes, trees, fromStops);
 
                     }
                 }
             }
         }
 
-        private void calcForOD(T fromZoneId, Coord fromCoord, T toZoneId, Coord toCoord, Map<Id<TransitStopFacility>, Double> accessTimes, List<Map<Id<TransitStopFacility>, SwissRailRaptorCore.TravelInfo>> trees) {
+        private void calcForOD(T fromZoneId, Coord fromCoord, T toZoneId, Coord toCoord, Map<Id<TransitStopFacility>, Double> accessTimes,
+                               List<Map<Id<TransitStopFacility>, SwissRailRaptorCore.TravelInfo>> trees, Collection<TransitStopFacility> fromStops) {
             double averageShuttleSpeed_ms = 30 / 3.6;
             //too long runtime
             //ch.sbb.matsim.analysis.skims.LeastCostPathTree treeFromDestination = new ch.sbb.matsim.analysis.skims.LeastCostPathTree(tt, td);
@@ -305,6 +307,21 @@ public class MyPtSkimMatricesWithAccessMode {
                 trainInVehTime += share * connTrainInVehTime;
             }
 
+
+            ODConnection fastestConnection = findFastestConnection(connections);
+            Id<TransitStopFacility> departureStopId = fastestConnection.travelInfo.departureStop;
+            TransitStopFacility departureStop = null;
+            for (TransitStopFacility stop : fromStops) {
+                if (stop.getId().equals(departureStopId)) {
+                    departureStop = stop;
+                }
+            }
+
+            if (departureStop != null && fromZoneId != null && toZoneId != null){
+                this.pti.coordinatesOfAccessStation.putIfAbsent(fromZoneId, new HashMap<>());
+                this.pti.coordinatesOfAccessStation.get(fromZoneId).put(toZoneId, departureStop.getCoord());
+            }
+
             float trainShareByTravelTime = (float) (trainInVehTime / totalInVehTime);
             float trainShareByDistance = (float) (trainDistance / totalDistance);
 
@@ -315,7 +332,6 @@ public class MyPtSkimMatricesWithAccessMode {
             this.pti.distanceMatrix.add(fromZoneId, toZoneId, (float) totalDistance);
             this.pti.trainDistanceShareMatrix.add(fromZoneId, toZoneId, trainShareByDistance);
             this.pti.trainTravelTimeShareMatrix.add(fromZoneId, toZoneId, trainShareByTravelTime);
-
             this.pti.dataCountMatrix.add(fromZoneId, toZoneId, 1);
         }
 
@@ -545,7 +561,7 @@ public class MyPtSkimMatricesWithAccessMode {
         public final MyFloatMatrix<T> transferCountMatrix;
         public final MyFloatMatrix<T> trainTravelTimeShareMatrix;
         public final MyFloatMatrix<T> trainDistanceShareMatrix;
-
+        public final Map<T, Map<T, Coord>> coordinatesOfAccessStation;
         public final MyFloatMatrix<T> dataCountMatrix; // how many values/routes were taken into account to calculate the averages
 
         PtIndicators(Set<T> zones) {
@@ -559,6 +575,7 @@ public class MyPtSkimMatricesWithAccessMode {
             this.dataCountMatrix = new MyFloatMatrix<>(zones, 0);
             this.trainTravelTimeShareMatrix = new MyFloatMatrix<>(zones, 0);
             this.trainDistanceShareMatrix = new MyFloatMatrix<>(zones, 0);
+            this.coordinatesOfAccessStation = new HashMap<>();
         }
     }
 
