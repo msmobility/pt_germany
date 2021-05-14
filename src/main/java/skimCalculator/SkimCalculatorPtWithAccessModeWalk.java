@@ -1,17 +1,17 @@
 package skimCalculator;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 
 import java.io.IOException;
-import java.util.Random;
 
 
-public class SkimCalculatorPtWithAccessMode {
+public class SkimCalculatorPtWithAccessModeWalk {
 
-    private static Logger log = Logger.getLogger(SkimCalculatorPtWithAccessMode.class);
+    private static Logger log = Logger.getLogger(SkimCalculatorPtWithAccessModeWalk.class);
 
     public static void main(String[] args) throws IOException {
 
@@ -20,14 +20,15 @@ public class SkimCalculatorPtWithAccessMode {
 
         Config config = ConfigUtils.loadConfig("./sbbConfigTest.xml");
 
-        String mode = "ld_train_with_auto_access_2";
+        String mode = "ld_train_with_walk_";
 
 
-        String outputDirectory = "./output/skims/ld_train_with_auto_access_2";
+        String outputDirectory = "./output/skims/ld_train_with_walk";
         String networkFilename = "./output/ld_train_2/network_merged.xml.gz";
         String transitScheduleFilename = "./output/ld_train_2/mapped_schedule.xml";
 
-        MyCalculateSkimMatricesWithAccessMode skims = new MyCalculateSkimMatricesWithAccessMode(zonesShapeFilename, zonesIdAttributeName, outputDirectory, 8);
+        MyCalculateSkimMatricesWithAccessMode skims = new MyCalculateSkimMatricesWithAccessMode(zonesShapeFilename,
+                zonesIdAttributeName, outputDirectory, 8, TransportMode.walk);
         skims.loadSamplingPointsFromFile("output/skims/ld_train_v3/zone_coordinates.csv");
         skims.calculatePTMatrices(networkFilename, transitScheduleFilename, 8 * 60 * 60, 8.1 * 60 * 60, config,
                 mode, (line, route) -> isRail(route));
