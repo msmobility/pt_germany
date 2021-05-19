@@ -23,7 +23,7 @@ public class SkimCalculatorPtWithAccessModeCar {
         String mode = "ld_train_with_auto_";
 
 
-        String outputDirectory = "./output/skims/ld_train_with_auto";
+        String outputDirectory = "./output/skims/ld_train_with_auto_v2";
         String networkFilename = "./output/db/network_merged.xml.gz";
         String transitScheduleFilename = "./output/db/mapped_schedule.xml";
 

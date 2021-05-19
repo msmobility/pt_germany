@@ -452,6 +452,8 @@ public class MyCalculateSkimMatricesWithAccessMode {
         createFloatOmxSkimMatrixFromFloatMatrix(matrices.trainTravelTimeShareMatrix, zones, omxFilePath, "train_time_share");
         createFloatOmxSkimMatrixFromFloatMatrix(matrices.trainDistanceShareMatrix, zones, omxFilePath, "train_distance_share");
         createFloatOmxSkimMatrixFromFloatMatrix(matrices.inVehicleTimeMatrix, zones, omxFilePath, "in_vehicle_time_s");
+        createFloatOmxSkimMatrixFromFloatMatrix(matrices.accessDistanceMatrix, zones, omxFilePath, "access_distance_m");
+        createFloatOmxSkimMatrixFromFloatMatrix(matrices.egressDistanceMatrix, zones, omxFilePath, "egress_distance_m");
 
 
         writeCoordinatesOfAccess(matrices.coordinatesOfAccessStation, outputDirectory + "/" + prefix + PT_ACCESS_STATION_COORDINATES);
@@ -547,7 +549,7 @@ public class MyCalculateSkimMatricesWithAccessMode {
                     System.out.println("Conversion to omx only works with zone integer IDs");
                 }
                 for (String destination : id2index.keySet()) {
-                    array[id2index.get(origin)][id2index.get(destination)] = (int) matrix.get(origin, destination);
+                    array[id2index.get(origin)][id2index.get(destination)] = matrix.get(origin, destination);
                 }
             }
 

@@ -495,7 +495,7 @@ private static final Logger log = Logger.getLogger(MyCalculateSkimMatrices.class
                     System.out.println("Conversion to omx only works with zone integer IDs");
                 }
                 for (String destination : id2index.keySet()){
-                    array[id2index.get(origin)][id2index.get(destination)] = (int) matrix.get(origin, destination);
+                    array[id2index.get(origin)][id2index.get(destination)] = matrix.get(origin, destination);
                 }
             }
 

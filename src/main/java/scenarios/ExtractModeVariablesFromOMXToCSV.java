@@ -59,9 +59,8 @@ public class ExtractModeVariablesFromOMXToCSV {
         PrintWriter pw = new PrintWriter(new File(outputFileName));
         pw.println("o,d,dist,mode,time,speed,transfers,share_distance,share_time");
         for (int origin : matrixCarDistance.getRowLookupArray()) {
-
-            if (random.nextDouble() < shareOfOriginZonesForAnalysis) {
                 for (int destination : matrixCarDistance.getColumnLookupArray()) {
+                    if (random.nextDouble() < shareOfOriginZonesForAnalysis) {
                     double distanceCar = matrixCarDistance.getIndexed(origin, destination);
                     double timeCar = matrixCar.getIndexed(origin, destination);
                     double timeTrain = matrixTrain.getIndexed(origin, destination);

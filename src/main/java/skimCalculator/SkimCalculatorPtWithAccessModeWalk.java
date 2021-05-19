@@ -20,12 +20,12 @@ public class SkimCalculatorPtWithAccessModeWalk {
 
         Config config = ConfigUtils.loadConfig("./sbbConfigTest.xml");
 
-        String mode = "ld_train_with_walk_";
+        String mode = "ld_bus_with_walk_";
 
 
-        String outputDirectory = "./output/skims/ld_train_with_walk";
-        String networkFilename = "./output/ld_train_2/network_merged.xml.gz";
-        String transitScheduleFilename = "./output/ld_train_2/mapped_schedule.xml";
+        String outputDirectory = "./output/skims/ld_bus_with_walk";
+        String networkFilename = "./output/ld_bus_2/network_merged.xml.gz";
+        String transitScheduleFilename = "./output/ld_bus_2/mapped_schedule.xml";
 
         MyCalculateSkimMatricesWithAccessMode skims = new MyCalculateSkimMatricesWithAccessMode(zonesShapeFilename,
                 zonesIdAttributeName, outputDirectory, 8, TransportMode.walk);
