@@ -9,8 +9,8 @@ import skimCalculator.OmxMatrixNames;
 public class BusNetworkMatrices {
 
 
-    private static String inputMatrixBusExisting = "c:/models/transit_germany/output/skims/ld_bus_v3/ld_bus_v3_matrices.omx";
-    private static String inputMatrixBusNew = "c:/models/transit_germany/output/skims/ld_bus_v3/ld_bus_v3_scenario2_matrices.omx";
+    private static String inputMatrixBusExisting = "c:/models/transit_germany/output/skims/ld_bus_with_walk/ld_bus_with_walk_matrices.omx";
+    private static String inputMatrixBusNew = "c:/models/transit_germany/output/skims/ld_bus_with_walk/ld_bus_with_walk_matrices_scenario_2.omx";
 
     private static IndexedDoubleMatrix2D matrixBusTimesExisting;
     private static IndexedDoubleMatrix2D matrixBusTimesNew;
