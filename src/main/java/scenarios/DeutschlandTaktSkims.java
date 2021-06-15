@@ -12,8 +12,8 @@ import java.util.Random;
 public class DeutschlandTaktSkims {
 
     String originalOmxFile1 = "c:/models/transit_germany/output/skims/ld_train_with_walk_2/ld_train_with_walk_matrices.omx";
-    String newOmxFile2 = "c:/models/transit_germany/output/skims/ld_train_with_walk_2/ld_train_with_walk_matrices_deutschland_takt.omx";
-    String fileName = "c:/models/transit_germany/output/skims/ld_train_with_walk_2/deutschland_takt_summary.csv";
+    String newOmxFile2 = "c:/models/transit_germany/output/skims/ld_train_with_walk_2/ld_train_with_walk_matrices_deutschland_takt_low_b.omx";
+    String fileName = "c:/models/transit_germany/output/skims/ld_train_with_walk_2/deutschland_takt_summary_low_b.csv";
 
     private IndexedDoubleMatrix2D trainAccess1;
     //private IndexedDoubleMatrix2D trainAccess2;
@@ -55,7 +55,7 @@ public class DeutschlandTaktSkims {
     private void createMatrices() throws FileNotFoundException {
 
         double inVehicleTimeReductionFactor = 0.10;
-        double timeReductionPerTransferFactor = 5. * 60.;
+        double timeReductionPerTransferFactor = 10. * 60.;
         Random random = new Random(-1);
         double scaleForSumamry = 0.005;
         PrintWriter pw = new PrintWriter(fileName);

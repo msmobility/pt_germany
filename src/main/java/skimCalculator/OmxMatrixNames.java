@@ -12,4 +12,6 @@ public class OmxMatrixNames {
     public static final String TRANSFERS_MATRIX_NAME = "transfer_count";
     public static final String TIME_SHARE_MATRIX_NAME = "train_time_share";
     public static final String EGRESS_TIME_MATRIX_NAME = "egress_time_s";
+    public static final String ACCESS_DISTANCE_MATRIX_NAME = "access_distance_m";
+    public static final String EGRESS_DISTANCE_MATRIX_NAME = "egress_distance_m";
 }

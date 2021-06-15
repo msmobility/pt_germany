@@ -42,6 +42,7 @@ import static skimCalculator.MyCalculateSkimMatricesWithAccessMode.extractXy2Lin
 
 public class MyPtSkimMatricesWithAccessMode {
 
+    private static double searchRadiusOverwritten = 40000;
     private static Logger log = Logger.getLogger(MyPtSkimMatricesWithAccessMode.class);
 
     private MyPtSkimMatricesWithAccessMode() {
@@ -139,7 +140,7 @@ public class MyPtSkimMatricesWithAccessMode {
     }
 
     static class RowWorker<T> implements Runnable {
-        private static double searchRadiusOverwritten = 100000;
+
         private final ConcurrentLinkedQueue<T> originZones;
         private final Set<T> destinationZones;
         private final Map<T, Coord[]> coordsPerZone;
@@ -157,7 +158,7 @@ public class MyPtSkimMatricesWithAccessMode {
         private final TravelDisutility td;
         private final String transportMode;
 
-        private final double averageShuttleSpeed_ms = 60 / 3.6;
+        private final double averageShuttleSpeed_ms = 40 / 3.6;
 
         RowWorker(ConcurrentLinkedQueue<T> originZones, Set<T> destinationZones, Map<T, Coord[]> coordsPerZone, PtIndicators<T> pti,
                   SwissRailRaptor raptor, RaptorParameters parameters, double minDepartureTime,
@@ -215,7 +216,7 @@ public class MyPtSkimMatricesWithAccessMode {
                     if (nodeData != null) {
                         //distance = nodeData.getDistance();
                         double accessOfAccess_m = CoordUtils.calcEuclideanDistance(nearestNode.getCoord(), fromCoord);
-                        accessTime = nodeData.getTime() - 8 * 3600 + accessOfAccess_m / averageShuttleSpeed_ms;
+                        accessTime = nodeData.getDistance() / averageShuttleSpeed_ms + accessOfAccess_m / averageShuttleSpeed_ms;
                         distance = accessOfAccess_m + nodeData.getDistance();
                     } else {
                         distance = CoordUtils.calcEuclideanDistance(stop.getCoord(), fromCoord);
@@ -367,7 +368,6 @@ public class MyPtSkimMatricesWithAccessMode {
             }
 
 
-
             Id<TransitStopFacility> departureStopId = fastestConnection.travelInfo.departureStop;
             TransitStopFacility departureStop = null;
             for (TransitStopFacility stop : fromStops) {
@@ -376,7 +376,7 @@ public class MyPtSkimMatricesWithAccessMode {
                 }
             }
 
-            try{
+            try {
                 if (departureStop != null && fromZoneId != null && toZoneId != null) {
                     this.pti.coordinatesOfAccessStation.putIfAbsent(fromZoneId, new HashMap<>());
                     Coord coord = departureStop.getCoord();
@@ -384,7 +384,7 @@ public class MyPtSkimMatricesWithAccessMode {
                         this.pti.coordinatesOfAccessStation.get(fromZoneId).put(toZoneId, coord);
                     }
                 }
-            } catch (NullPointerException e){
+            } catch (NullPointerException e) {
                 System.out.println("some null found");
             }
 

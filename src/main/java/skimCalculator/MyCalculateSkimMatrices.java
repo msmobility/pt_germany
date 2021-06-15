@@ -88,9 +88,11 @@ private static final Logger log = Logger.getLogger(MyCalculateSkimMatrices.class
         private final String outputDirectory;
         private final int numberOfThreads;
         private Map<String, Coord[]> coordsPerZone = null;
+        private final boolean avoidToll;
 
-        public MyCalculateSkimMatrices(String zonesShapeFilename, String zonesIdAttributeName, String outputDirectory, int numberOfThreads) {
+        public MyCalculateSkimMatrices(String zonesShapeFilename, String zonesIdAttributeName, String outputDirectory, int numberOfThreads, boolean avoidToll) {
             this.outputDirectory = outputDirectory;
+            this.avoidToll = avoidToll;
             File outputDir = new File(outputDirectory);
             if (!outputDir.exists()) {
                 log.info("create output directory " + outputDirectory);
@@ -254,60 +256,60 @@ private static final Logger log = Logger.getLogger(MyCalculateSkimMatrices.class
             MyFloatMatrixIO.writeAsCSV(beelineMatrix, outputDirectory + "/" + BEELINE_DISTANCE_FILENAME);
         }
 
-        public final void calculateNetworkMatrices(String networkFilename, String eventsFilename, double[] times, Config config, String outputPrefix, Predicate<Link> xy2linksPredicate) throws IOException {
-            String prefix = outputPrefix == null ? "" : outputPrefix;
-            Scenario scenario = ScenarioUtils.createScenario(config);
-            log.info("loading network from " + networkFilename);
-            new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
+//        public final void calculateNetworkMatrices(String networkFilename, String eventsFilename, double[] times, Config config, String outputPrefix, Predicate<Link> xy2linksPredicate) throws IOException {
+//            String prefix = outputPrefix == null ? "" : outputPrefix;
+//            Scenario scenario = ScenarioUtils.createScenario(config);
+//            log.info("loading network from " + networkFilename);
+//            new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
+//
+//            TravelTime tt;
+//            if (eventsFilename != null) {
+//                log.info("extracting actual travel times from " + eventsFilename);
+//                TravelTimeCalculator ttc = TravelTimeCalculator.create(scenario.getNetwork(),config.travelTimeCalculator());
+//                EventsManager events = EventsUtils.createEventsManager();
+//                events.addHandler(ttc);
+//                new MatsimEventsReader(events).readFile(eventsFilename);
+//                tt = ttc.getLinkTravelTimes();
+//            } else {
+//                tt = new FreeSpeedTravelTime();
+//                log.info("No events specified. Travel Times will be calculated with free speed travel times.");
+//            }
+//
+//            TravelDisutility td = new OnlyTimeDependentTravelDisutility(tt);
+//
+//            log.info("extracting car-only network");
+//            final Network carNetwork = NetworkUtils.createNetwork();
+//            new TransportModeNetworkFilter(scenario.getNetwork()).filter(carNetwork, Collections.singleton(TransportMode.car));
+//
+//            log.info("filter car-only network for assigning links to locations");
+//            final Network xy2linksNetwork = extractXy2LinksNetwork(carNetwork, xy2linksPredicate);
+//
+//            log.info("calc CAR matrix for " + Time.writeTime(times[0]));
+//            MyNetworkSkimMatrices.NetworkIndicators<String> netIndicators = MyNetworkSkimMatrices.calculateSkimMatrices(
+//                    xy2linksNetwork, carNetwork, zonesById, coordsPerZone, times[0], tt, td, this.numberOfThreads);
+//
+//            if (tt instanceof FreeSpeedTravelTime) {
+//                log.info("Do not calculate CAR matrices for other times as only freespeed is being used");
+//            } else {
+//                for (int i = 1; i < times.length; i++) {
+//                    log.info("calc CAR matrices for " + Time.writeTime(times[i]));
+//                    MyNetworkSkimMatrices.NetworkIndicators<String> indicators2 = MyNetworkSkimMatrices.calculateSkimMatrices(
+//                            xy2linksNetwork, carNetwork, zonesById, coordsPerZone, times[i], tt, td, this.numberOfThreads);
+//                    log.info("merge CAR matrices for " + Time.writeTime(times[i]));
+//                    combineMatrices(netIndicators.travelTimeMatrix, indicators2.travelTimeMatrix);
+//                    combineMatrices(netIndicators.distanceMatrix, indicators2.distanceMatrix);
+//                }
+//                log.info("re-scale CAR matrices after all data is merged.");
+//                netIndicators.travelTimeMatrix.multiply((float) (1.0 / times.length));
+//                netIndicators.distanceMatrix.multiply((float) (1.0 / times.length));
+//            }
+//
+//            log.info("write CAR matrices to " + outputDirectory + (prefix.isEmpty() ? "" : (" with prefix " + prefix)));
+//            MyFloatMatrixIO.writeAsCSV(netIndicators.travelTimeMatrix, outputDirectory + "/" + prefix + CAR_TRAVELTIMES_FILENAME);
+//            MyFloatMatrixIO.writeAsCSV(netIndicators.distanceMatrix, outputDirectory + "/" + prefix + CAR_DISTANCES_FILENAME);
+//        }
 
-            TravelTime tt;
-            if (eventsFilename != null) {
-                log.info("extracting actual travel times from " + eventsFilename);
-                TravelTimeCalculator ttc = TravelTimeCalculator.create(scenario.getNetwork(),config.travelTimeCalculator());
-                EventsManager events = EventsUtils.createEventsManager();
-                events.addHandler(ttc);
-                new MatsimEventsReader(events).readFile(eventsFilename);
-                tt = ttc.getLinkTravelTimes();
-            } else {
-                tt = new FreeSpeedTravelTime();
-                log.info("No events specified. Travel Times will be calculated with free speed travel times.");
-            }
-
-            TravelDisutility td = new OnlyTimeDependentTravelDisutility(tt);
-
-            log.info("extracting car-only network");
-            final Network carNetwork = NetworkUtils.createNetwork();
-            new TransportModeNetworkFilter(scenario.getNetwork()).filter(carNetwork, Collections.singleton(TransportMode.car));
-
-            log.info("filter car-only network for assigning links to locations");
-            final Network xy2linksNetwork = extractXy2LinksNetwork(carNetwork, xy2linksPredicate);
-
-            log.info("calc CAR matrix for " + Time.writeTime(times[0]));
-            MyNetworkSkimMatrices.NetworkIndicators<String> netIndicators = MyNetworkSkimMatrices.calculateSkimMatrices(
-                    xy2linksNetwork, carNetwork, zonesById, coordsPerZone, times[0], tt, td, this.numberOfThreads);
-
-            if (tt instanceof FreeSpeedTravelTime) {
-                log.info("Do not calculate CAR matrices for other times as only freespeed is being used");
-            } else {
-                for (int i = 1; i < times.length; i++) {
-                    log.info("calc CAR matrices for " + Time.writeTime(times[i]));
-                    MyNetworkSkimMatrices.NetworkIndicators<String> indicators2 = MyNetworkSkimMatrices.calculateSkimMatrices(
-                            xy2linksNetwork, carNetwork, zonesById, coordsPerZone, times[i], tt, td, this.numberOfThreads);
-                    log.info("merge CAR matrices for " + Time.writeTime(times[i]));
-                    combineMatrices(netIndicators.travelTimeMatrix, indicators2.travelTimeMatrix);
-                    combineMatrices(netIndicators.distanceMatrix, indicators2.distanceMatrix);
-                }
-                log.info("re-scale CAR matrices after all data is merged.");
-                netIndicators.travelTimeMatrix.multiply((float) (1.0 / times.length));
-                netIndicators.distanceMatrix.multiply((float) (1.0 / times.length));
-            }
-
-            log.info("write CAR matrices to " + outputDirectory + (prefix.isEmpty() ? "" : (" with prefix " + prefix)));
-            MyFloatMatrixIO.writeAsCSV(netIndicators.travelTimeMatrix, outputDirectory + "/" + prefix + CAR_TRAVELTIMES_FILENAME);
-            MyFloatMatrixIO.writeAsCSV(netIndicators.distanceMatrix, outputDirectory + "/" + prefix + CAR_DISTANCES_FILENAME);
-        }
-
-    public final void calculateNetworkMatricesWithTolls(String networkFilename, String eventsFilename, double[] times, Config config, String outputPrefix, Predicate<Link> xy2linksPredicate) throws IOException {
+    public final void calculateNetworkMatrices(String networkFilename, String eventsFilename, double[] times, Config config, String outputPrefix, Predicate<Link> xy2linksPredicate) throws IOException {
         String prefix = outputPrefix == null ? "" : outputPrefix;
         Scenario scenario = ScenarioUtils.createScenario(config);
         log.info("loading network from " + networkFilename);
@@ -327,7 +329,13 @@ private static final Logger log = Logger.getLogger(MyCalculateSkimMatrices.class
         }
 
         //change here to avoid tolls or not
-        TravelDisutility td = TollUtils.getTravelDisutilityToAvoidTolls(tt);
+        TravelDisutility td;
+        if (avoidToll){
+            td = TollUtils.getTravelDisutilityToAvoidTolls(tt);
+        } else {
+            td = new OnlyTimeDependentTravelDisutility(tt);
+        }
+
 
         log.info("extracting car-only network");
         final Network carNetwork = NetworkUtils.createNetwork();
@@ -368,6 +376,8 @@ private static final Logger log = Logger.getLogger(MyCalculateSkimMatrices.class
         createFloatOmxSkimMatrixFromFloatMatrix(netIndicators.tollDistanceMatrix, zones, omxFilePath, "tollDistance_m");
         createFloatOmxSkimMatrixFromFloatMatrix(netIndicators.distanceMatrix, zones, omxFilePath, "distance_m");
         createFloatOmxSkimMatrixFromFloatMatrix(netIndicators.travelTimeMatrix, zones, omxFilePath, "time_s");
+
+
     }
 
         private Network extractXy2LinksNetwork(Network network, Predicate<Link> xy2linksPredicate) {
@@ -569,7 +579,7 @@ private static final Logger log = Logger.getLogger(MyCalculateSkimMatrices.class
             Config config = ConfigUtils.createConfig();
             Random r = new Random(4711);
 
-            MyCalculateSkimMatrices skims = new MyCalculateSkimMatrices(zonesShapeFilename, zonesIdAttributeName, outputDirectory, numberOfThreads);
+            MyCalculateSkimMatrices skims = new MyCalculateSkimMatrices(zonesShapeFilename, zonesIdAttributeName, outputDirectory, numberOfThreads, false);
             skims.calculateSamplingPointsPerZoneFromFacilities(facilitiesFilename, numberOfPointsPerZone, r, f -> 1);
             // alternative if you don't have facilities, use the network:
             // skims.calculateSamplingPointsPerZoneFromNetwork(networkFilename, numberOfPointsPerZone, r);

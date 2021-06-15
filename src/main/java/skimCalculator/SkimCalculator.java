@@ -32,7 +32,7 @@ public class SkimCalculator {
 //        String networkFilename = "./output/opnv/network_merged_germany_bus.xml.gz";
 //        String transitScheduleFilename = "./output/opnv/schedule_germany_" + mode + "_mapped.xml";
 
-        MyCalculateSkimMatrices skims = new MyCalculateSkimMatrices(zonesShapeFilename, zonesIdAttributeName, outputDirectory, 8);
+        MyCalculateSkimMatrices skims = new MyCalculateSkimMatrices(zonesShapeFilename, zonesIdAttributeName, outputDirectory, 8, false);
         //skims.loadSamplingPointsFromFile("./input/centroids/meanStopsCSVModified.csv");
 
         //skims.calculateSamplingPointsPerZoneFromFacilities(facilitiesFilename, numberOfPointsPerZone, r, facility -> 1.0);

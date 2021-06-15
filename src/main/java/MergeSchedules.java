@@ -26,7 +26,7 @@ public class MergeSchedules {
         /*
         Add here the n schedules to merge (if more or less, some minor changes in the code may be required)
          */
-        new TransitScheduleReader(scenarioOne).readFile("./output/opnv_rb_v2/schedule_germany_all.xml");
+        new TransitScheduleReader(scenarioOne).readFile("./output/rb/schedule.xml");
         new TransitScheduleReader(scenarioTwo).readFile("./output/db/schedule.xml");
 //        new TransitScheduleReader(scenarioThree).readFile("./output/blablabus/scheduleModeLdBus.xml");
         //new TransitScheduleReader(scenarioFour).readFile("./output/flixbus/schedule.xml");
@@ -40,7 +40,7 @@ public class MergeSchedules {
         /**
          * Define suffixes to the schedule elements to prevent duplicate ids
          */
-        scheduleOne = addSuffixToScheduleElements(scheduleOne, "_access");
+        scheduleOne = addSuffixToScheduleElements(scheduleOne, "_rb");
         scheduleTwo = addSuffixToScheduleElements(scheduleTwo, "_ld");
 //        scheduleThree = addSuffixToScheduleElements(scheduleThree, "_blablabus");
         //scheduleFour = addSuffixToScheduleElements(scheduleFour, "_flixbus");
@@ -65,11 +65,11 @@ public class MergeSchedules {
         /**
          * Define output files for schedule and vehicles
          */
-        new TransitScheduleWriter(mergedSchedule).writeFile("./output/ld_train/schedule.xml");
+        new TransitScheduleWriter(mergedSchedule).writeFile("./output/ld_rb/schedule_germany.xml");
 
         Vehicles vehicles = VehicleUtils.createVehiclesContainer();
         createVehiclesForSchedule(mergedSchedule, vehicles);
-        new VehicleWriterV1(vehicles).writeFile("./output/ld_train/vehicles.xml");
+        new VehicleWriterV1(vehicles).writeFile("./output/ld_rb/vehicles_germany.xml");
 
 
     }

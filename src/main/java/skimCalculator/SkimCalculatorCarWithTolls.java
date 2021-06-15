@@ -22,11 +22,11 @@ public class SkimCalculatorCarWithTolls {
         String outputDirectory = "./output/skims/carWithoutToll";
         String networkFilename = "./input/road_networks/eu_germany_network_w_connector.xml.gz";
 
-        MyCalculateSkimMatrices skims = new MyCalculateSkimMatrices(zonesShapeFilename, zonesIdAttributeName, outputDirectory, 16);
-        skims.loadSamplingPointsFromFile("output/skims/ld_train_v3/zone_coordinates.csv");
+        MyCalculateSkimMatrices skims = new MyCalculateSkimMatrices(zonesShapeFilename, zonesIdAttributeName, outputDirectory, 16, true);
+        skims.loadSamplingPointsFromFile("./output/skims/zone_coordinates_1_point.csv");
 
         double[] timesCar = new double[]{8 * 3600};
-        skims.calculateNetworkMatricesWithTolls(networkFilename, null, timesCar, config, null, link -> true);
+        skims.calculateNetworkMatrices(networkFilename, null, timesCar, config, null, link -> true);
 
 
     }
