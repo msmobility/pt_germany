@@ -15,7 +15,8 @@ public class TollUtils {
     private static final Logger log = Logger.getLogger(TollUtils.class);
 
     public static boolean hasToll(Link l) {
-        if (l.getAttributes().getAttribute("type").toString().equals("motorway")){
+        if (l.getAttributes().getAttribute("type").toString().equals("motorway") ||
+                l.getAttributes().getAttribute("admin_type").toString().equals("bundestrasse")) {
             return true;
         } else {
             return false;
@@ -23,7 +24,7 @@ public class TollUtils {
 
     }
 
-    static TravelDisutility getTravelDisutilityToAvoidTolls(TravelTime travelTime){
+    static TravelDisutility getTravelDisutilityToAvoidTolls(TravelTime travelTime) {
         TravelTime thisTravelTime;
         if (travelTime == null) {
             log.warn("TimeCalculator is null so FreeSpeedTravelTimes will be calculated!");
@@ -33,10 +34,10 @@ public class TollUtils {
         TravelDisutility td = new TravelDisutility() {
             @Override
             public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle vehicle) {
-                if (hasToll(link)){
-                    return link.getLength()/0.0001;
+                if (hasToll(link)) {
+                    return link.getLength() / 0.0001;
                 } else {
-                    return  thisTravelTime.getLinkTravelTime(link, time, person, vehicle);
+                    return thisTravelTime.getLinkTravelTime(link, time, person, vehicle);
                 }
             }
 
@@ -47,8 +48,6 @@ public class TollUtils {
         };
         return td;
     }
-
-
 
 
 }

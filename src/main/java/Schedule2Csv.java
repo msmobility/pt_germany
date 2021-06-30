@@ -23,8 +23,8 @@ public class Schedule2Csv {
 
         Scenario scenarioOne = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-        new TransitScheduleReader(scenarioOne).readFile("./input/schedule_mvp.xml");
-        String csvFile = "./output/lines.csv" ;
+        new TransitScheduleReader(scenarioOne).readFile("./output/ld_train_2/mapped_schedule.xml");
+        String csvFile = "./output/ld_train_2/lines.csv" ;
 
         PrintWriter pw = new PrintWriter(new File(csvFile));
         pw.println("line,line_name,route,mode,seq,stop_id,stop_name,stop_x,stop_y");

@@ -14,4 +14,7 @@ public class OmxMatrixNames {
     public static final String EGRESS_TIME_MATRIX_NAME = "egress_time_s";
     public static final String ACCESS_DISTANCE_MATRIX_NAME = "access_distance_m";
     public static final String EGRESS_DISTANCE_MATRIX_NAME = "egress_distance_m";
+
+    public static final String CAR_TIME = "time_s";
+    public static final String CAR_DISTANCE = "distance_m";
 }

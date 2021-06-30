@@ -19,10 +19,11 @@ public class SkimCalculatorCarWithTolls {
 
         Config config = ConfigUtils.loadConfig("./sbbConfigTest.xml");
 
-        String outputDirectory = "./output/skims/carWithoutToll";
-        String networkFilename = "./input/road_networks/eu_germany_network_w_connector.xml.gz";
+        String outputDirectory = "./output/skims/carWithToll_ab";
+        String networkFilename = "./input/road_networks/eu_germany_network_w_connector_trucks_ab.xml.gz";
 
-        MyCalculateSkimMatrices skims = new MyCalculateSkimMatrices(zonesShapeFilename, zonesIdAttributeName, outputDirectory, 16, true);
+        MyCalculateSkimMatrices skims = new MyCalculateSkimMatrices(zonesShapeFilename,
+                zonesIdAttributeName, outputDirectory, 16, false);
         skims.loadSamplingPointsFromFile("./output/skims/zone_coordinates_1_point.csv");
 
         double[] timesCar = new double[]{8 * 3600};

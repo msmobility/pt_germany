@@ -21,27 +21,33 @@ public class OmxAnalyzer {
 
     public static void main(String[] args) throws FileNotFoundException {
 
-        fileNames.put("base","c:/models/transit_germany/output/skims/ld_train_with_walk_2/ld_train_with_walk_matrices.omx");
-        fileNames.put("1","c:/models/transit_germany/output/skims/ld_train_with_auto_2/ld_train_with_auto_matrices.omx");
-        fileNames.put("2","c:/models/transit_germany/output/skims/ld_rb_sb_train_with_auto/ld_rb_sb_train_with_auto_matrices.omx");
+//        fileNames.put("base","c:/models/transit_germany/output/skims/ld_train_with_walk_2/ld_train_with_walk_matrices.omx");
+//        fileNames.put("1","c:/models/transit_germany/output/skims/ld_train_with_auto_2/ld_train_with_auto_matrices.omx");
+//        fileNames.put("2","c:/models/transit_germany/output/skims/ld_rb_sb_train_with_auto/ld_rb_sb_train_with_auto_matrices.omx");
+//
+//        matrixList.add(OmxMatrixNames.DISTANCE_MATRIX_NAME);
+//        matrixList.add(OmxMatrixNames.TT_MATRIX_NAME);
+//        matrixList.add(OmxMatrixNames.ACCESS_TIME_MATRIX_NAME);
+//        matrixList.add(OmxMatrixNames.EGRESS_TIME_MATRIX_NAME);
+//        matrixList.add(OmxMatrixNames.IN_VEH_TIME_MATRIX_NAME);
+//        matrixList.add((OmxMatrixNames.TRANSFERS_MATRIX_NAME));
+//        matrixList.add(OmxMatrixNames.ACCESS_DISTANCE_MATRIX_NAME);
+//        matrixList.add(OmxMatrixNames.EGRESS_DISTANCE_MATRIX_NAME);
+//        matrixList.add(OmxMatrixNames.DISTANCE_SHARE_MATRIX_NAME);
+//        matrixList.add(OmxMatrixNames.TIME_SHARE_MATRIX_NAME);
 
-        matrixList.add(OmxMatrixNames.DISTANCE_MATRIX_NAME);
-        matrixList.add(OmxMatrixNames.TT_MATRIX_NAME);
-        matrixList.add(OmxMatrixNames.ACCESS_TIME_MATRIX_NAME);
-        matrixList.add(OmxMatrixNames.EGRESS_TIME_MATRIX_NAME);
-        matrixList.add(OmxMatrixNames.IN_VEH_TIME_MATRIX_NAME);
-        matrixList.add((OmxMatrixNames.TRANSFERS_MATRIX_NAME));
-        matrixList.add(OmxMatrixNames.ACCESS_DISTANCE_MATRIX_NAME);
-        matrixList.add(OmxMatrixNames.EGRESS_DISTANCE_MATRIX_NAME);
-        matrixList.add(OmxMatrixNames.DISTANCE_SHARE_MATRIX_NAME);
-        matrixList.add(OmxMatrixNames.TIME_SHARE_MATRIX_NAME);
+        fileNames.put("base", "c:/models/transit_germany/output/skims/carWithToll/car_matrix_toll.omx");
+        fileNames.put("congested", "c:/models/transit_germany/output/skims/auto_congested/car_matrix.omx");
+
+        matrixList.add(OmxMatrixNames.CAR_DISTANCE);
+        matrixList.add(OmxMatrixNames.CAR_TIME);
 
         scaleFactor = 0.005;
         intrazonalsOnly = false;
 
         OmxAnalyzer dataExtractor = new OmxAnalyzer();
         dataExtractor.readInput(fileNames, matrixList);
-        final String outputFileName = "c:/projects/bast_entlastung/analysis/ld_model_analysis/scenarios/results_scenario_1_v3.csv";
+        final String outputFileName = "c:/projects/bast_entlastung/analysis/ld_model_analysis/scenarios/results_congestion.csv";
         dataExtractor.runAnalysis(scaleFactor, intrazonalsOnly, outputFileName);
 
     }

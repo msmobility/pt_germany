@@ -21,27 +21,26 @@ public class SkimCalculator {
         //RaptorUtils.createStaticConfig(config);
         //RaptorUtils.createParameters(config);
 
-        String mode = "ld_train_v4_";
+        String mode = "auto_congested";
 
         //for the v2
-        String outputDirectory = "./output/skims/ld_train_v4";
-        String networkFilename = "./output/db/network_merged.xml.gz";
-        String transitScheduleFilename = "./output/db/mapped_schedule.xml";
-
+        String outputDirectory = "./output/skims/auto_congested";
+        String networkFilename = "./input/road_networks/eu_germany_network_w_connector_trucks_ab.xml.gz";
+        String eventFilename = "F:/matsim_germany/output/run_210625/all.output_events.xml.gz";
 //        String outputDirectory = "./output/skims/germany_all_v1/";
 //        String networkFilename = "./output/opnv/network_merged_germany_bus.xml.gz";
 //        String transitScheduleFilename = "./output/opnv/schedule_germany_" + mode + "_mapped.xml";
 
         MyCalculateSkimMatrices skims = new MyCalculateSkimMatrices(zonesShapeFilename, zonesIdAttributeName, outputDirectory, 8, false);
-        //skims.loadSamplingPointsFromFile("./input/centroids/meanStopsCSVModified.csv");
+        skims.loadSamplingPointsFromFile("./output/skims/zone_coordinates_1_point.csv");
 
         //skims.calculateSamplingPointsPerZoneFromFacilities(facilitiesFilename, numberOfPointsPerZone, r, facility -> 1.0);
         // alternative if you don't have facilities:
-        skims.calculateSamplingPointsPerZoneFromNetwork(networkFilename, 1, new Random(0));
-        //double[] timesCar = new double[]{8 * 3600};
-        //skims.calculateNetworkMatrices(networkFilename, null, timesCar, config, null, link -> true);
-        skims.calculatePTMatrices(networkFilename, transitScheduleFilename, 8 * 60 * 60, 8.1 * 60 * 60, config,
-                mode, (line, route) -> isCoach(route));
+        //skims.calculateSamplingPointsPerZoneFromNetwork(networkFilename, 1, new Random(0));
+        double[] timesCar = new double[]{17 * 3600};
+        skims.calculateNetworkMatrices(networkFilename, eventFilename, timesCar, config, null, link -> true);
+//        skims.calculatePTMatrices(networkFilename, transitScheduleFilename, 8 * 60 * 60, 8.1 * 60 * 60, config,
+//                mode, (line, route) -> isCoach(route));
 
         //skims.calculateBeelineMatrix();
 
