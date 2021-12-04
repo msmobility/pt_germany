@@ -65,5 +65,5 @@ vignettes/*.pdf
 /pt_german_wide.iml
 
 /.idea/
-/.input/
-/.output/
+/input/
+/output/
