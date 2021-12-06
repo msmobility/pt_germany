@@ -1,3 +1,4 @@
+package scheduleEdition;
 
 import org.matsim.pt2matsim.run.Gtfs2TransitSchedule;
 import org.matsim.pt2matsim.run.PublicTransitMapper;
@@ -15,7 +16,7 @@ public class RunPt2MatsimMapper {
          * The config file must include the paths to schedule files, road network and other settings
          * regarding which modes are routed on the road network and which ones are not.
          */
-        String configFile = "./" + service + "Config.xml";
+        String configFile = "./mapperConfig.xml";
         PublicTransitMapper.run(configFile);
 
     }

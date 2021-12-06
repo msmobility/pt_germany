@@ -1,3 +1,5 @@
+package scheduleEdition;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
@@ -87,7 +89,7 @@ public class AddDeparturesAndTravelTimes {
         new TransitScheduleWriterV2(newTransitSchedule).write(newScheduleFile);
 
         Vehicles vehicles = VehicleUtils.createVehiclesContainer();
-        // MergeSchedules.createVehiclesForSchedule(newTransitSchedule, vehicles);
+        // scheduleEdition.MergeSchedules.createVehiclesForSchedule(newTransitSchedule, vehicles);
         //new VehicleWriterV1(vehicles).writeFile(newVehFile);
 
 

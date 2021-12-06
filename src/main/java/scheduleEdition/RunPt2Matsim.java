@@ -1,3 +1,4 @@
+package scheduleEdition;
 
 import org.matsim.pt2matsim.run.Gtfs2TransitSchedule;
 import org.matsim.pt2matsim.run.PublicTransitMapper;

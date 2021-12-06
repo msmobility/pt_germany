@@ -1,3 +1,5 @@
+package scheduleEdition;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
@@ -11,21 +13,46 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MergeMultiplesSchedules {
+public class MergeSchedules {
 
     public static void main(String[] args) {
 
-        List<TransitSchedule> transitSchedules = new ArrayList<>();
+        /**
+         * initialize n scenarios
+         */
+        Scenario scenarioOne = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        Scenario scenarioTwo = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+//        Scenario scenarioThree = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        //Scenario scenarioFour= ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-        for (int i = 0; i < args.length; i++){
-            Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-            new TransitScheduleReader(scenario).readFile(args[i]);
-            TransitSchedule schedule = scenario.getTransitSchedule();
-            schedule = addSuffixToScheduleElements(schedule, "_" + i);
-            transitSchedules.add(schedule);
-        }
+        /*
+        Add here the n schedules to merge (if more or less, some minor changes in the code may be required)
+         */
+        new TransitScheduleReader(scenarioOne).readFile("./output/rb/schedule.xml");
+        new TransitScheduleReader(scenarioTwo).readFile("./output/db/schedule.xml");
+//        new TransitScheduleReader(scenarioThree).readFile("./output/blablabus/scheduleModeLdBus.xml");
+        //new TransitScheduleReader(scenarioFour).readFile("./output/flixbus/schedule.xml");
+        TransitSchedule scheduleOne = scenarioOne.getTransitSchedule();
+        TransitSchedule scheduleTwo = scenarioTwo.getTransitSchedule();
+//        TransitSchedule scheduleThree = scenarioThree.getTransitSchedule();
+        //TransitSchedule scheduleFour = scenarioFour.getTransitSchedule();
 
         final TransitSchedule mergedSchedule = new TransitScheduleFactoryImpl().createTransitSchedule();
+
+        /**
+         * Define suffixes to the schedule elements to prevent duplicate ids
+         */
+        scheduleOne = addSuffixToScheduleElements(scheduleOne, "_rb");
+        scheduleTwo = addSuffixToScheduleElements(scheduleTwo, "_ld");
+//        scheduleThree = addSuffixToScheduleElements(scheduleThree, "_blablabus");
+        //scheduleFour = addSuffixToScheduleElements(scheduleFour, "_flixbus");
+
+        List<TransitSchedule> transitSchedules = new ArrayList<>();
+
+        transitSchedules.add(scheduleOne);
+        transitSchedules.add(scheduleTwo);
+//        transitSchedules.add(scheduleThree);
+        //transitSchedules.add(scheduleFour);
 
         for (TransitSchedule schedule : transitSchedules){
             for (TransitStopFacility stop : schedule.getFacilities().values()) {
@@ -40,11 +67,11 @@ public class MergeMultiplesSchedules {
         /**
          * Define output files for schedule and vehicles
          */
-        new TransitScheduleWriter(mergedSchedule).writeFile("./output/opnv_rb_v2/schedule_germany_all.xml");
+        new TransitScheduleWriter(mergedSchedule).writeFile("./output/ld_rb/schedule_germany.xml");
 
         Vehicles vehicles = VehicleUtils.createVehiclesContainer();
         createVehiclesForSchedule(mergedSchedule, vehicles);
-        new VehicleWriterV1(vehicles).writeFile("./output/opnv_rb_v2/vehicles_germany_all.xml");
+        new VehicleWriterV1(vehicles).writeFile("./output/ld_rb/vehicles_germany.xml");
 
 
     }
@@ -67,7 +94,7 @@ public class MergeMultiplesSchedules {
         {
             VehicleType vehicleType = vb.createVehicleType(Id.create("bus", VehicleType.class));
             VehicleCapacity capacity = new VehicleCapacityImpl();
-            capacity.setSeats(Integer.valueOf(101));
+            capacity.setSeats(Integer.valueOf(100));
             capacity.setStandingRoom(Integer.valueOf(0));
             vehicleType.setCapacity(capacity);
             vehicles.addVehicleType(vehicleType);
@@ -105,17 +132,13 @@ public class MergeMultiplesSchedules {
             vehicleTypeMap.put(vehicleType.getId().toString(), vehicleType);
         }
 
-        int duplicateVehicleCounter = 0;
         for (TransitLine line : schedule.getTransitLines().values()) {
+            System.out.println(line.getId());
             for (TransitRoute route : line.getRoutes().values()) {
+                System.out.println(route.getStops());
                 for (Departure departure : route.getDepartures().values()) {
-                    Id<Vehicle> vehicleId = Id.createVehicleId(line.getId().toString() + "_" + route.getId() + "_" + departure.getVehicleId().toString());
-                    if (vehicles.getVehicles().get(vehicleId)!= null){
-                        vehicleId = Id.createVehicleId(line.getId().toString() + "_" + route.getId() + "_" +
-                                departure.getVehicleId().toString() + "_" + duplicateVehicleCounter);
-                        System.out.println("Vehicle/departure duplicate!");
-                        duplicateVehicleCounter++;
-                    }
+                    System.out.println(route.getDepartures().values().toString());
+                    Id<Vehicle> vehicleId = departure.getVehicleId();
                     VehicleType vehicleType = getVehicleTypeFromId(vehicleId, vehicleTypeMap);
                     Vehicle veh = vb.createVehicle(vehicleId, vehicleType);
                     vehicles.addVehicle(veh);
@@ -123,7 +146,6 @@ public class MergeMultiplesSchedules {
                 }
             }
         }
-        System.out.println("There are " + duplicateVehicleCounter + " duplicates");
 
 
 
@@ -176,7 +198,7 @@ public class MergeMultiplesSchedules {
                 for (Departure departure : route.getDepartures().values()) {
                     departure.getDepartureTime();
                     Id<Departure> newDepartureId = Id.create(departure.getId() + suffix, Departure.class);
-                    Id<Vehicle> newVehicleId = Id.create(newDepartureId.toString(), Vehicle.class);
+                    Id<Vehicle> newVehicleId = Id.create(departure.getVehicleId() + suffix, Vehicle.class);
                     Departure newDeparture = factory.createDeparture(newDepartureId, departure.getDepartureTime());
                     newDeparture.setVehicleId(newVehicleId);
                     newRoute.addDeparture(newDeparture);

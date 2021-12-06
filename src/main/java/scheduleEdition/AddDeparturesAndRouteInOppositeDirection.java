@@ -1,3 +1,5 @@
+package scheduleEdition;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
@@ -13,7 +15,6 @@ import org.matsim.vehicles.Vehicles;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 public class AddDeparturesAndRouteInOppositeDirection {
 

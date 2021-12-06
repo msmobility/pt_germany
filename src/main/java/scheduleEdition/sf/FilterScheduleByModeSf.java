@@ -1,40 +1,38 @@
+package scheduleEdition.sf;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.GeometryUtils;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV2;
 import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
+import scheduleEdition.CutScheduleByShape;
+import scheduleEdition.MergeSchedules;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class FilterScheduleByMode {
+public class FilterScheduleByModeSf {
 
 
     public static void main(String[] args) {
 
         /**
-         * name of the service that will be filtered
-         */
-        String service = "opnv_rb_v2";
-
-        /**
          * original schedule file
          */
-        String scheduleFile = "./output/" + service + "/schedule_germany_all_mapped.xml";
+        String scheduleFile = "./matsim/mapped_schedule.xml";
         /**
          * new schedule file
          */
-        String newScheduleFile = "./output/" + service + "/schedule_germany_bus_tram_subway.xml";
+        String newScheduleFile = "./matsim/all_metro/mapped_schedule.xml";
 
         /**
          * new vehicle file
          */
-        String vehFileName = "./output/" + service + "/vehicle_germany_bus_tram_subway.xml";
+        String vehFileName = "./matsim/all_metro/vehicle.xml";
 
 
         /**

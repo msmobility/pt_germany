@@ -11,9 +11,9 @@ import java.util.Random;
 
 public class DeutschlandTaktSkims {
 
-    String originalOmxFile1 = "c:/models/transit_germany/output/skims/ld_train_with_walk_2/ld_train_with_walk_matrices.omx";
-    String newOmxFile2 = "c:/models/transit_germany/output/skims/ld_train_with_walk_2/ld_train_with_walk_matrices_deutschland_takt_low_b.omx";
-    String fileName = "c:/models/transit_germany/output/skims/ld_train_with_walk_2/deutschland_takt_summary_low_b.csv";
+    String originalOmxFile1 = "c:/models/transit_germany/output/skims/ld_rb_sb_train_with_auto/ld_rb_sb_train_with_auto_matrices.omx";
+    String newOmxFile2 = "F:/ld_rb_sb_train_with_auto_matrices_deutschland_takt_low.omx";;
+    String fileName = "F:/deutschland_takt_summary_low_b_with_auto.csv";
 
     private IndexedDoubleMatrix2D trainAccess1;
     //private IndexedDoubleMatrix2D trainAccess2;
@@ -28,6 +28,8 @@ public class DeutschlandTaktSkims {
     private IndexedDoubleMatrix2D distance1;
     //private IndexedDoubleMatrix2D distance2;
     private IndexedDoubleMatrix2D transfers1;
+    private IndexedDoubleMatrix2D accessDistance1;
+    private IndexedDoubleMatrix2D egressDistance1;
     // private IndexedDoubleMatrix2D transfers2;
 
 
@@ -49,13 +51,15 @@ public class DeutschlandTaktSkims {
         trainInVehicle1 = OmxSkimsReader.readAndConvertToDoubleMatrix(originalOmxFile1, OmxMatrixNames.IN_VEH_TIME_MATRIX_NAME, 1.0);
         distance1 = OmxSkimsReader.readAndConvertToDoubleMatrix(originalOmxFile1, OmxMatrixNames.DISTANCE_MATRIX_NAME, 1.0);
         transfers1 = OmxSkimsReader.readAndConvertToDoubleMatrix(originalOmxFile1, OmxMatrixNames.TRANSFERS_MATRIX_NAME, 1.0);
+        accessDistance1 = OmxSkimsReader.readAndConvertToDoubleMatrix(originalOmxFile1, OmxMatrixNames.ACCESS_DISTANCE_MATRIX_NAME, 1.0);
+        egressDistance1 = OmxSkimsReader.readAndConvertToDoubleMatrix(originalOmxFile1, OmxMatrixNames.EGRESS_DISTANCE_MATRIX_NAME, 1.0);
         System.out.println("Matrices were read");
     }
 
     private void createMatrices() throws FileNotFoundException {
 
         double inVehicleTimeReductionFactor = 0.10;
-        double timeReductionPerTransferFactor = 10. * 60.;
+        double timeReductionPerTransferFactor = 5 * 60.;
         Random random = new Random(-1);
         double scaleForSumamry = 0.005;
         PrintWriter pw = new PrintWriter(fileName);
@@ -128,6 +132,9 @@ public class DeutschlandTaktSkims {
         OmxMatrixWriter.createOmxFile(newOmxFile2, trainAccess1.getRowLookupArray().length);
         OmxMatrixWriter.createOmxSkimMatrix(trainAccess1, newOmxFile2, OmxMatrixNames.ACCESS_TIME_MATRIX_NAME);
         OmxMatrixWriter.createOmxSkimMatrix(trainEgress1, newOmxFile2, OmxMatrixNames.EGRESS_TIME_MATRIX_NAME);
+        OmxMatrixWriter.createOmxSkimMatrix(accessDistance1, newOmxFile2, OmxMatrixNames.ACCESS_DISTANCE_MATRIX_NAME);
+        OmxMatrixWriter.createOmxSkimMatrix(egressDistance1, newOmxFile2, OmxMatrixNames.EGRESS_DISTANCE_MATRIX_NAME);
+
         OmxMatrixWriter.createOmxSkimMatrix(distance1, newOmxFile2, OmxMatrixNames.DISTANCE_MATRIX_NAME);
         OmxMatrixWriter.createOmxSkimMatrix(transfers1, newOmxFile2, OmxMatrixNames.TRANSFERS_MATRIX_NAME);
 

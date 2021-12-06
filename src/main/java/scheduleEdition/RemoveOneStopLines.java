@@ -1,3 +1,5 @@
+package scheduleEdition;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -61,7 +63,7 @@ public class RemoveOneStopLines {
             new TransitScheduleWriterV2(newTransitSchedule).write(newScheduleFile);
 
             //Vehicles vehicles = VehicleUtils.createVehiclesContainer();
-            //MergeSchedulesOSM.createVehiclesForSchedule(newTransitSchedule, vehicles);
+            //scheduleEdition.MergeSchedulesOSM.createVehiclesForSchedule(newTransitSchedule, vehicles);
             //new VehicleWriterV1(vehicles).writeFile(vehFileName);
         }
 

@@ -1,3 +1,5 @@
+package scheduleEdition;
+
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.utils.TransitScheduleValidator;

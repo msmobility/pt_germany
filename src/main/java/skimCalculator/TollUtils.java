@@ -14,14 +14,20 @@ public class TollUtils {
 
     private static final Logger log = Logger.getLogger(TollUtils.class);
 
-    public static boolean hasToll(Link l) {
-        if (l.getAttributes().getAttribute("type").toString().equals("motorway") ||
-                l.getAttributes().getAttribute("admin_type").toString().equals("bundestrasse")) {
-            return true;
-        } else {
-            return false;
-        }
+//    public static boolean hasToll(Link l) {
+//        if (l.getAttributes().getAttribute("type").toString().equals("motorway") ||
+//                l.getAttributes().getAttribute("admin_type").toString().equals("bundestrasse")) {
+//            return true;
+//        } else {
+//            return false;
+//        }
+//
+//    }
 
+
+    //enable this method if the toll calculations are not required and the toll data is not in the network
+    public static boolean hasToll(Link l) {
+            return false;
     }
 
     static TravelDisutility getTravelDisutilityToAvoidTolls(TravelTime travelTime) {
