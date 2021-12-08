@@ -43,12 +43,19 @@ public class SkimReader {
     private void processRecord(String[] record, double factor) {
         int origin = Integer.parseInt(record[positionOrigin]);
         int destination = Integer.parseInt(record[positionDestination]);
+        //Todo Check with @Carlos, the forEachNonZero might generate inconsistent results, so we need to handle 0 travel time additionally
+        record[positionvalue] = Double.parseDouble(record[positionvalue]) == 0 ? "0.01" : record[positionvalue];
         double time = Double.parseDouble(record[positionvalue]) * factor;
 
+        //Todo Need a smarter control to switch between internal and internal + external
+        //For internal + external
         if (!Double.isNaN(time) && time != 0){
             matrix.setIndexed(origin, destination, time);
         }
-
+        //For internal only
+        //if (!Double.isNaN(time) && time != 0 && (origin <= 11717 && destination <= 11717)){
+        //    matrix.setIndexed(origin, destination, time);
+        //}
 
     }
 
