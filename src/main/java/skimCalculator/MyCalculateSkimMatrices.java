@@ -255,7 +255,7 @@ public class MyCalculateSkimMatrices {
 
     public final void loadSamplingPointsFromFile(String filename) throws IOException {
         log.info("loading sampling points from " + filename);
-        String expectedHeader = "ZONE;POINT_INDEX;X;Y";
+        String expectedHeader = "ZONE,POINT_INDEX,X,Y";
         this.coordsPerZone = new HashMap<>();
         try (BufferedReader reader = IOUtils.getBufferedReader(filename)) {
             String header = reader.readLine();
@@ -265,7 +265,7 @@ public class MyCalculateSkimMatrices {
             String line;
             int maxIdx = 0;
             while ((line = reader.readLine()) != null) {
-                String[] parts = StringUtils.explode(line, ';');
+                String[] parts = StringUtils.explode(line, ',');
                 String zoneId = parts[0];
                 int idx = Integer.parseInt(parts[1]);
                 double x = Double.parseDouble(parts[2]);

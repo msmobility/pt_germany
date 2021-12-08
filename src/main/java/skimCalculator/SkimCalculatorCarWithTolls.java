@@ -21,8 +21,8 @@ public class SkimCalculatorCarWithTolls {
         //Todo seeting for each run
         boolean avoidToll = false; //true: auto_noToll ; false: auto
         boolean appliedTollOnBundesstrasse = false;
-        String eventsFilename = "./input/2011_base_output_events.xml.gz";
-        String outputDirectory = "./output/skims/car_freeflow";
+        //String eventsFilename = "./input/2011_base_output_events.xml.gz";
+        String outputDirectory = "./output/skims/freeflow_3points_grid";
 
         Random rmd = new Random(10);
 
@@ -35,7 +35,7 @@ public class SkimCalculatorCarWithTolls {
         //Resampling points in zones
         //skims.calculateSamplingPointsPerZoneFromNetwork(networkFilename, 3, rmd);
 
-        skims.loadSamplingPointsFromFile("./output/zone_coordinates.csv");
+        skims.loadSamplingPointsFromFile("./output/zone_coordinates_3_kMeans_grid.csv");
 
         double[] timesCar = new double[]{8 * 3600};
         //freeflow
