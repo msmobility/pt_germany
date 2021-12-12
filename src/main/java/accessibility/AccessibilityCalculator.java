@@ -67,8 +67,8 @@ public class AccessibilityCalculator {
     private void run() throws IOException {
 
         Map<String, String> matrices = new HashMap<>();
-        matrices.put("carFreeFlow", "./output/skims/freeflow_3points_pop/car_traveltimes.csv.gz");
-        matrices.put("carCongested", "./output/skims/congested_3points_pop/car_traveltimes.csv.gz");
+        matrices.put("carFreeFlow_1700", "./output/skims/freeflow_3points_pop/car_traveltimes.csv.gz");
+        matrices.put("carCongested_1700", "./output/skims/congested_1700_1point_carlos/car_traveltimes.csv.gz");
         //matrices.put("ld_rail", "./output/skims/ld_train_v3_pt_traveltimes.csv.gz");
         //matrices.put("ld_bus", "./output/skims/ld_train_v3_pt_traveltimes.csv.gz");
 
@@ -125,11 +125,13 @@ public class AccessibilityCalculator {
                         double access = Arrays.stream(array).sum();
                         boolean isDomestic = zoneMap.get(row).isDomestic();
 
-                        if (minAccessibility > access && isDomestic) {
+                        //Todo if (minAccessibility > access && isDomestic) {
+                        if (minAccessibility > access) {
                             minAccessibility = access;
                         }
 
-                        if (maxAccessibility < access && isDomestic) {
+                        //Todo if (maxAccessibility < access && isDomestic) {
+                        if (maxAccessibility < access) {
                             maxAccessibility = access;
                         }
 
@@ -150,7 +152,7 @@ public class AccessibilityCalculator {
 
     private void printResultWide() throws FileNotFoundException {
 
-        PrintWriter pw = new PrintWriter("./output/accessibility/potential_population_11879_wide_20211208_0800.csv");
+        PrintWriter pw = new PrintWriter("./output/accessibility/potential_population_11879_wide_20211209_1700_old.csv");
 
         StringBuilder header = new StringBuilder();
         header.append("zone").append(",");
@@ -192,7 +194,7 @@ public class AccessibilityCalculator {
 
     private void printResult() throws FileNotFoundException {
 
-        PrintWriter pw = new PrintWriter("./output/accessibility/potential_population_11879_long_20211207_0800.csv");
+        PrintWriter pw = new PrintWriter("./output/accessibility/potential_population_11879_long_20211209_1700_old.csv");
         pw.print("zone,skim,alpha,beta,accessibility,scaledAccessibility");
         pw.println();
 
