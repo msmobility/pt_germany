@@ -15,7 +15,7 @@ public class RunPt2MatsimMapper {
          * The config file must include the paths to schedule files, road network and other settings
          * regarding which modes are routed on the road network and which ones are not.
          */
-        String configFile = "./input/pt2MATSimMapper.xml";
+        String configFile = "./input/pt2MATSimMapperConfig.xml";
         PublicTransitMapper.run(configFile); //Todo Carlos used this line to generate additional public transport lines
 
     }

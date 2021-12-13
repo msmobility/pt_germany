@@ -18,7 +18,7 @@ public class SkimCalculatorPtWithAccessModeWalk {
         String zonesShapeFilename = "./input/zones/TAZs_completed_11879_skimCalculation.shp";
         String zonesIdAttributeName = "TAZ_id";
 
-        Config config = ConfigUtils.loadConfig("./input/sbbConfig.xml");
+        Config config = ConfigUtils.loadConfig("./input/skimCalculatorConfig.xml");
 
         String mode = "ld_rail_with_walk_";
 
