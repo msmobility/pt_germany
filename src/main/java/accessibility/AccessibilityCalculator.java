@@ -67,15 +67,16 @@ public class AccessibilityCalculator {
     private void run() throws IOException {
 
         Map<String, String> matrices = new HashMap<>();
-        matrices.put("carFreeFlow_1700", "./output/skims/freeflow_3points_pop/car_traveltimes.csv.gz");
-        matrices.put("carCongested_1700", "./output/skims/congested_1700_1point_carlos/car_traveltimes.csv.gz");
-        //matrices.put("ld_rail", "./output/skims/ld_train_v3_pt_traveltimes.csv.gz");
-        //matrices.put("ld_bus", "./output/skims/ld_train_v3_pt_traveltimes.csv.gz");
+        matrices.put("carFreeFlow", "./output/skims/freeflow_3points_pop/car_traveltimes.csv.gz");
+        matrices.put("carCongested_0800", "./output/skims/congested_0800_3points_pop/car_traveltimes.csv.gz");
+        matrices.put("carCongested_1700", "./output/skims/congested_1700_3points_pop/car_traveltimes.csv.gz");
+        matrices.put("ld_rail", "./output/skims/ld_rail_carlos/ld_train_v3_pt_traveltimes.csv.gz");
+        matrices.put("ld_bus", "./output/skims/ld_bus_carlos/ld_bus_v3_pt_traveltimes.csv.gz");
 
         double[] alphaSets = {0.4, 0.6, 0.8, 1.0};
         double[] betaSets = {-0.2, -0.4, -0.6, -0.8, -1.0, -2.0, -3.0, -5.0};
-        double alpha = 0.0;
-        double beta = 0.0;
+        double alpha;
+        double beta;
 
         for (String skim : matrices.keySet()) {
             accessibility.put(skim, new HashMap<>());
@@ -95,17 +96,17 @@ public class AccessibilityCalculator {
 //                double[] after1 = after.toNonIndexedArray();
 //            }
 
-            for (int alphaParameter = 0; alphaParameter < alphaSets.length; alphaParameter++) {
-                alpha = alphaSets[alphaParameter];
+            for (double alphaSet : alphaSets) {
+                alpha = alphaSet;
                 accessibility.get(skim).put(alpha, new HashMap<>());
                 accessibilityNormalized.get(skim).put(alpha, new HashMap<>());
 
-                for (int betaParameter = 0; betaParameter < betaSets.length; betaParameter++) {
+                for (double betaSet : betaSets) {
 
                     IndexedDoubleMatrix2D matCalculation = new IndexedDoubleMatrix2D(lookupArray);
                     matCalculation.assign(mat);
 
-                    beta = betaSets[betaParameter];
+                    beta = betaSet;
                     accessibility.get(skim).get(alpha).put(beta, new HashMap<>());
                     accessibilityNormalized.get(skim).get(alpha).put(beta, new HashMap<>());
 
@@ -125,13 +126,11 @@ public class AccessibilityCalculator {
                         double access = Arrays.stream(array).sum();
                         boolean isDomestic = zoneMap.get(row).isDomestic();
 
-                        //Todo if (minAccessibility > access && isDomestic) {
-                        if (minAccessibility > access) {
+                        if (minAccessibility > access && isDomestic) {
                             minAccessibility = access;
                         }
 
-                        //Todo if (maxAccessibility < access && isDomestic) {
-                        if (maxAccessibility < access) {
+                        if (maxAccessibility < access && isDomestic) {
                             maxAccessibility = access;
                         }
 
@@ -152,7 +151,7 @@ public class AccessibilityCalculator {
 
     private void printResultWide() throws FileNotFoundException {
 
-        PrintWriter pw = new PrintWriter("./output/accessibility/potential_population_11879_wide_20211209_1700_old.csv");
+        PrintWriter pw = new PrintWriter("./output/accessibility/potential_population_11879_wide_20211210.csv");
 
         StringBuilder header = new StringBuilder();
         header.append("zone").append(",");
@@ -194,7 +193,7 @@ public class AccessibilityCalculator {
 
     private void printResult() throws FileNotFoundException {
 
-        PrintWriter pw = new PrintWriter("./output/accessibility/potential_population_11879_long_20211209_1700_old.csv");
+        PrintWriter pw = new PrintWriter("./output/accessibility/potential_population_11879_long_20211210.csv");
         pw.print("zone,skim,alpha,beta,accessibility,scaledAccessibility");
         pw.println();
 
@@ -223,8 +222,6 @@ public class AccessibilityCalculator {
         }
         pw.close();
     }
-
-
 
 
 }
