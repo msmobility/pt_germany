@@ -21,8 +21,8 @@ public class CheckTransitRouteShape {
     private static final Logger log = Logger.getLogger(MyCalculateSkimMatrices.class);
     private static final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
     private static TransitScheduleReaderV1 transitScheduleReader;
-    private static final String transitScheduleFile = "Z:/indiv/wei/ld_network_schedule/unmapped_schedule_modified_v1.xml";
-    private static final String outputCsvFile = "Z:/indiv/wei/ld_network_schedule/linesInfoWithDist_new_v2.csv";
+    private static final String transitScheduleFile = "./input/transitSchedule/unmapped_schedule_modified_v1.xml";
+    private static final String outputCsvFile = "./input/transitSchedule/linesInfoWithDist_new_v2.csv";
     private static int numScannedStops = 0;
     private static int numScannedLines = 0;
     private static int numScannedRoutes = 0;

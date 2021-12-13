@@ -28,10 +28,10 @@ public class ModifyTransitRouteShape {
     private static final Config config = ConfigUtils.createConfig();
     private static final Scenario scenario = ScenarioUtils.createScenario(config);
 
-    private static final String transitScheduleFile = "Z:/indiv/wei/ld_network_schedule/mapped_schedule.xml";
+    private static final String transitScheduleFile = "./input/transitSchedule/mapped_schedule.xml";
 
-    private static final String repairListPath = "Z:/indiv/wei/ld_network_schedule/repairList.csv";
-    private static final String outputTransitScheduleFile = "Z:/indiv/wei/ld_network_schedule/unmapped_schedule_modified_v1.xml";
+    private static final String repairListPath = "./input/transitSchedule/repairList.csv";
+    private static final String outputTransitScheduleFile = "./input/transitSchedule/unmapped_schedule_modified_v1.xml";
 
     private static int numModifiedStops = 0;
     private static int numScannedStops = 0;

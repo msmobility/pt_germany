@@ -24,8 +24,8 @@ public class SkimCalculatorPtWithAccessModeWalk {
 
 
         String outputDirectory = "./output/skims/ld_rail_with_walk";
-        String networkFilename = "./input/road_networks/network_merged_modified_v1.xml.gz";
-        String transitScheduleFilename = "./input/road_networks/mapped_schedule_modified_v1.xml";
+        String networkFilename = "./input/road_networks/mergedNetwork_20211213_wei.xml.gz";
+        String transitScheduleFilename = "./input/transitSchedule/mapped_schedule_20211213_wei.xml";
 
         MyCalculateSkimMatricesWithAccessMode skims = new MyCalculateSkimMatricesWithAccessMode(zonesShapeFilename,
                 zonesIdAttributeName, outputDirectory, 16, TransportMode.walk);
