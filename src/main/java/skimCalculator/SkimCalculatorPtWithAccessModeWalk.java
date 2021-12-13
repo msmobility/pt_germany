@@ -18,20 +18,20 @@ public class SkimCalculatorPtWithAccessModeWalk {
         String zonesShapeFilename = "./input/zones/TAZs_completed_11879_skimCalculation.shp";
         String zonesIdAttributeName = "TAZ_id";
 
-        Config config = ConfigUtils.loadConfig("./sbbConfigTest.xml");
+        Config config = ConfigUtils.loadConfig("./input/sbbConfig.xml");
 
-        String mode = "ld_bus_with_walk_";
+        String mode = "ld_rail_with_walk_";
 
 
-        String outputDirectory = "./output/skims/ld_bus_with_walk";
-        String networkFilename = "./output/ld_bus_2/network_merged.xml.gz";
-        String transitScheduleFilename = "./output/ld_bus_2/mapped_schedule.xml";
+        String outputDirectory = "./output/skims/ld_rail_with_walk";
+        String networkFilename = "./input/road_networks/network_merged_modified_v1.xml.gz";
+        String transitScheduleFilename = "./input/road_networks/mapped_schedule_modified_v1.xml";
 
         MyCalculateSkimMatricesWithAccessMode skims = new MyCalculateSkimMatricesWithAccessMode(zonesShapeFilename,
-                zonesIdAttributeName, outputDirectory, 8, TransportMode.walk);
-        skims.loadSamplingPointsFromFile("output/skims/ld_train_v3/zone_coordinates.csv");
+                zonesIdAttributeName, outputDirectory, 16, TransportMode.walk);
+        skims.loadSamplingPointsFromFile("./output/zone_coordinates_3_kMeans_pop.csv");
         skims.calculatePTMatrices(networkFilename, transitScheduleFilename, 8 * 60 * 60, 8.1 * 60 * 60, config,
-                mode, (line, route) -> isRail(route));
+                mode, (line, route) -> isRailTramOrSubway(route));
 
         //skims.calculateBeelineMatrix();
 
@@ -42,35 +42,23 @@ public class SkimCalculatorPtWithAccessModeWalk {
     Use this for mito mode == tramMetro, to find when these modes are not used.
      */
     private static boolean isRailTramOrSubway(TransitRoute route) {
-        if (route.getTransportMode().equalsIgnoreCase("rail") ||
+        return route.getTransportMode().equalsIgnoreCase("rail") ||
                 route.getTransportMode().equalsIgnoreCase("tram") ||
-                route.getTransportMode().equalsIgnoreCase("subway")) {
-            return true;
-        } else {
-            return false;
-        }
+                route.getTransportMode().equalsIgnoreCase("subway");
     }
 
     /*
        Use this for mito mode == tramMetro, to find when these modes are not used.
         */
     private static boolean isCoach(TransitRoute route) {
-        if (route.getTransportMode().equalsIgnoreCase("coach")) {
-            return true;
-        } else {
-            return false;
-        }
+        return route.getTransportMode().equalsIgnoreCase("coach");
     }
 
     /*
     Use this for mito mode == train, to find when train is not used
      */
     private static boolean isRail(TransitRoute route) {
-        if (route.getTransportMode().equalsIgnoreCase("rail")) {
-            return true;
-        } else {
-            return false;
-        }
+        return route.getTransportMode().equalsIgnoreCase("rail");
     }
 
 

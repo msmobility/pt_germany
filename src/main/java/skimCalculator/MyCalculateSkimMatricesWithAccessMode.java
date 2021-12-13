@@ -224,7 +224,7 @@ public class MyCalculateSkimMatricesWithAccessMode {
 
     public final void loadSamplingPointsFromFile(String filename) throws IOException {
         log.info("loading sampling points from " + filename);
-        String expectedHeader = "ZONE;POINT_INDEX;X;Y";
+        String expectedHeader = "ZONE,POINT_INDEX,X,Y";
         this.coordsPerZone = new HashMap<>();
         try (BufferedReader reader = IOUtils.getBufferedReader(filename)) {
             String header = reader.readLine();
@@ -234,7 +234,7 @@ public class MyCalculateSkimMatricesWithAccessMode {
             String line;
             int maxIdx = 0;
             while ((line = reader.readLine()) != null) {
-                String[] parts = StringUtils.explode(line, ';');
+                String[] parts = StringUtils.explode(line, ',');
                 String zoneId = parts[0];
                 int idx = Integer.parseInt(parts[1]);
                 double x = Double.parseDouble(parts[2]);
@@ -372,11 +372,11 @@ public class MyCalculateSkimMatricesWithAccessMode {
         MyFloatMatrixIO.writeAsCSV(netIndicators.distanceMatrix, outputDirectory + "/" + prefix + CAR_DISTANCES_FILENAME);
         MyFloatMatrixIO.writeAsCSV(netIndicators.tollDistanceMatrix, outputDirectory + "/" + prefix + "toll_distances.csv.gz");
 
-        String omxFilePath = outputDirectory + "/" + "car_matrix.omx";
-        OmxMatrixWriter.createOmxFile(omxFilePath, zones.size());
-        createFloatOmxSkimMatrixFromFloatMatrix(netIndicators.tollDistanceMatrix, zones, omxFilePath, "tollDistance_m");
-        createFloatOmxSkimMatrixFromFloatMatrix(netIndicators.distanceMatrix, zones, omxFilePath, "distance_m");
-        createFloatOmxSkimMatrixFromFloatMatrix(netIndicators.travelTimeMatrix, zones, omxFilePath, "time_s");
+        //String omxFilePath = outputDirectory + "/" + "car_matrix.omx";
+        //OmxMatrixWriter.createOmxFile(omxFilePath, zones.size());
+        //createFloatOmxSkimMatrixFromFloatMatrix(netIndicators.tollDistanceMatrix, zones, omxFilePath, "tollDistance_m");
+        //createFloatOmxSkimMatrixFromFloatMatrix(netIndicators.distanceMatrix, zones, omxFilePath, "distance_m");
+        //createFloatOmxSkimMatrixFromFloatMatrix(netIndicators.travelTimeMatrix, zones, omxFilePath, "time_s");
     }
 
     public static Network extractXy2LinksNetwork(Network network, Predicate<Link> xy2linksPredicate) {
@@ -429,32 +429,31 @@ public class MyCalculateSkimMatricesWithAccessMode {
                 config, networkFilename, link -> true, transportMode);
 
         log.info("write PT matrices to " + outputDirectory + (prefix.isEmpty() ? "" : (" with prefix " + prefix)));
-//            MyFloatMatrixIO.writeAsCSV(matrices.adaptionTimeMatrix, outputDirectory + "/" + prefix + PT_ADAPTIONTIMES_FILENAME);
-//            MyFloatMatrixIO.writeAsCSV(matrices.frequencyMatrix, outputDirectory + "/" + prefix + PT_FREQUENCIES_FILENAME);
-//            MyFloatMatrixIO.writeAsCSV(matrices.distanceMatrix, outputDirectory + "/" + prefix + PT_DISTANCES_FILENAME);
-//            MyFloatMatrixIO.writeAsCSV(matrices.travelTimeMatrix, outputDirectory + "/" + prefix + PT_TRAVELTIMES_FILENAME);
-//            MyFloatMatrixIO.writeAsCSV(matrices.accessTimeMatrix, outputDirectory + "/" + prefix + PT_ACCESSTIMES_FILENAME);
-//            MyFloatMatrixIO.writeAsCSV(matrices.egressTimeMatrix, outputDirectory + "/" + prefix + PT_EGRESSTIMES_FILENAME);
-//            MyFloatMatrixIO.writeAsCSV(matrices.transferCountMatrix, outputDirectory + "/" + prefix + PT_TRANSFERCOUNTS_FILENAME);
-//            MyFloatMatrixIO.writeAsCSV(matrices.trainTravelTimeShareMatrix, outputDirectory + "/" + prefix + PT_TRAINSHARE_BYTIME_FILENAME);
-//            MyFloatMatrixIO.writeAsCSV(matrices.trainDistanceShareMatrix, outputDirectory + "/" + prefix + PT_TRAINSHARE_BYDISTANCE_FILENAME);
+            MyFloatMatrixIO.writeAsCSV(matrices.adaptionTimeMatrix, outputDirectory + "/" + prefix + PT_ADAPTIONTIMES_FILENAME);
+            MyFloatMatrixIO.writeAsCSV(matrices.frequencyMatrix, outputDirectory + "/" + prefix + PT_FREQUENCIES_FILENAME);
+            MyFloatMatrixIO.writeAsCSV(matrices.distanceMatrix, outputDirectory + "/" + prefix + PT_DISTANCES_FILENAME);
+            MyFloatMatrixIO.writeAsCSV(matrices.travelTimeMatrix, outputDirectory + "/" + prefix + PT_TRAVELTIMES_FILENAME);
+            MyFloatMatrixIO.writeAsCSV(matrices.accessTimeMatrix, outputDirectory + "/" + prefix + PT_ACCESSTIMES_FILENAME);
+            MyFloatMatrixIO.writeAsCSV(matrices.egressTimeMatrix, outputDirectory + "/" + prefix + PT_EGRESSTIMES_FILENAME);
+            MyFloatMatrixIO.writeAsCSV(matrices.transferCountMatrix, outputDirectory + "/" + prefix + PT_TRANSFERCOUNTS_FILENAME);
+            MyFloatMatrixIO.writeAsCSV(matrices.trainTravelTimeShareMatrix, outputDirectory + "/" + prefix + PT_TRAINSHARE_BYTIME_FILENAME);
+            MyFloatMatrixIO.writeAsCSV(matrices.trainDistanceShareMatrix, outputDirectory + "/" + prefix + PT_TRAINSHARE_BYDISTANCE_FILENAME);
 
-        String omxFilePath = outputDirectory + "/" + prefix + "matrices.omx";
-        OmxMatrixWriter.createOmxFile(omxFilePath, zones.size());
+        //String omxFilePath = outputDirectory + "/" + prefix + "matrices.omx";
+        //OmxMatrixWriter.createOmxFile(omxFilePath, zones.size());
 
-        createFloatOmxSkimMatrixFromFloatMatrix(matrices.adaptionTimeMatrix, zones, omxFilePath, "adaption_time_s");
-        createFloatOmxSkimMatrixFromFloatMatrix(matrices.frequencyMatrix, zones, omxFilePath, "frequency");
-        createFloatOmxSkimMatrixFromFloatMatrix(matrices.distanceMatrix, zones, omxFilePath, "distance_m");
-        createFloatOmxSkimMatrixFromFloatMatrix(matrices.travelTimeMatrix, zones, omxFilePath, "travel_time_s");
-        createFloatOmxSkimMatrixFromFloatMatrix(matrices.accessTimeMatrix, zones, omxFilePath, "access_time_s");
-        createFloatOmxSkimMatrixFromFloatMatrix(matrices.egressTimeMatrix, zones, omxFilePath, "egress_time_s");
-        createFloatOmxSkimMatrixFromFloatMatrix(matrices.transferCountMatrix, zones, omxFilePath, "transfer_count");
-        createFloatOmxSkimMatrixFromFloatMatrix(matrices.trainTravelTimeShareMatrix, zones, omxFilePath, "train_time_share");
-        createFloatOmxSkimMatrixFromFloatMatrix(matrices.trainDistanceShareMatrix, zones, omxFilePath, "train_distance_share");
-        createFloatOmxSkimMatrixFromFloatMatrix(matrices.inVehicleTimeMatrix, zones, omxFilePath, "in_vehicle_time_s");
-        createFloatOmxSkimMatrixFromFloatMatrix(matrices.accessDistanceMatrix, zones, omxFilePath, "access_distance_m");
-        createFloatOmxSkimMatrixFromFloatMatrix(matrices.egressDistanceMatrix, zones, omxFilePath, "egress_distance_m");
-
+        //createFloatOmxSkimMatrixFromFloatMatrix(matrices.adaptionTimeMatrix, zones, omxFilePath, "adaption_time_s");
+        //createFloatOmxSkimMatrixFromFloatMatrix(matrices.frequencyMatrix, zones, omxFilePath, "frequency");
+        //createFloatOmxSkimMatrixFromFloatMatrix(matrices.distanceMatrix, zones, omxFilePath, "distance_m");
+        //createFloatOmxSkimMatrixFromFloatMatrix(matrices.travelTimeMatrix, zones, omxFilePath, "travel_time_s");
+        //createFloatOmxSkimMatrixFromFloatMatrix(matrices.accessTimeMatrix, zones, omxFilePath, "access_time_s");
+        //createFloatOmxSkimMatrixFromFloatMatrix(matrices.egressTimeMatrix, zones, omxFilePath, "egress_time_s");
+        //createFloatOmxSkimMatrixFromFloatMatrix(matrices.transferCountMatrix, zones, omxFilePath, "transfer_count");
+        //createFloatOmxSkimMatrixFromFloatMatrix(matrices.trainTravelTimeShareMatrix, zones, omxFilePath, "train_time_share");
+        //createFloatOmxSkimMatrixFromFloatMatrix(matrices.trainDistanceShareMatrix, zones, omxFilePath, "train_distance_share");
+        //createFloatOmxSkimMatrixFromFloatMatrix(matrices.inVehicleTimeMatrix, zones, omxFilePath, "in_vehicle_time_s");
+        //createFloatOmxSkimMatrixFromFloatMatrix(matrices.accessDistanceMatrix, zones, omxFilePath, "access_distance_m");
+        //createFloatOmxSkimMatrixFromFloatMatrix(matrices.egressDistanceMatrix, zones, omxFilePath, "egress_distance_m");
 
         writeCoordinatesOfAccess(matrices.coordinatesOfAccessStation, outputDirectory + "/" + prefix + PT_ACCESS_STATION_COORDINATES);
 
@@ -471,9 +470,9 @@ public class MyCalculateSkimMatricesWithAccessMode {
             String[] zoneIds = coordinatesOfAccessStation.keySet().toArray(new String[0]);
             for (String fromZoneId : zoneIds) {
                 for (String toZoneId : zoneIds) {
-                    writer.write(fromZoneId.toString());
+                    writer.write(fromZoneId);
                     writer.append(SEP);
-                    writer.write(toZoneId.toString());
+                    writer.write(toZoneId);
                     writer.append(SEP);
                     Coord coord = coordinatesOfAccessStation.get(fromZoneId).get(toZoneId);
                     if (coord != null) {
@@ -510,7 +509,7 @@ public class MyCalculateSkimMatricesWithAccessMode {
 
             for (String origin : id2index.keySet()) {
                 try {
-                    indices[id2index.get(origin)] = Integer.valueOf(origin);
+                    indices[id2index.get(origin)] = Integer.parseInt(origin);
                 } catch (NumberFormatException e) {
                     System.out.println("Conversion to omx only works with zone integer IDs");
                 }
@@ -544,7 +543,7 @@ public class MyCalculateSkimMatricesWithAccessMode {
 
             for (String origin : id2index.keySet()) {
                 try {
-                    indices[id2index.get(origin)] = Integer.valueOf(origin);
+                    indices[id2index.get(origin)] = Integer.parseInt(origin);
                 } catch (NumberFormatException e) {
                     System.out.println("Conversion to omx only works with zone integer IDs");
                 }
@@ -606,8 +605,8 @@ public class MyCalculateSkimMatricesWithAccessMode {
         String transitScheduleFilename = args[4];
         String eventsFilename = args[5];
         String outputDirectory = args[6];
-        int numberOfPointsPerZone = Integer.valueOf(args[7]);
-        int numberOfThreads = Integer.valueOf(args[8]);
+        int numberOfPointsPerZone = Integer.parseInt(args[7]);
+        int numberOfThreads = Integer.parseInt(args[8]);
         String[] timesCarStr = args[9].split(";");
         String[] timesPtStr = args[10].split(";");
         Set<String> modes = CollectionUtils.stringToSet(args[11]);
