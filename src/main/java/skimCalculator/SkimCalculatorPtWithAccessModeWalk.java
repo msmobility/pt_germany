@@ -20,10 +20,10 @@ public class SkimCalculatorPtWithAccessModeWalk {
 
         Config config = ConfigUtils.loadConfig("./input/skimCalculatorConfig.xml");
 
-        String mode = "ld_rail_with_walk_";
+        String mode = "ld_rail_with_walk_1";
 
 
-        String outputDirectory = "./output/skims/ld_rail_with_walk";
+        String outputDirectory = "./output/skims/ld_rail_with_walk_1333";
         String networkFilename = "./input/road_networks/mergedNetwork_20211213_wei.xml.gz";
         String transitScheduleFilename = "./input/transitSchedule/mapped_schedule_20211213_wei.xml";
 

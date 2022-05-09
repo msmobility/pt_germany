@@ -1,6 +1,7 @@
 package skimCalculator;
 
-import com.pb.common.matrix.Matrix;
+//import com.pb.common.matrix.Matrix;
+import de.tum.bgu.msm.common.matrix.Matrix;
 import de.tum.bgu.msm.utils.SiloUtil;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;

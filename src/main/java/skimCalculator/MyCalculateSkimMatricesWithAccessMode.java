@@ -82,7 +82,7 @@ public class MyCalculateSkimMatricesWithAccessMode {
     private final static GeometryFactory GEOMETRY_FACTORY = new GeometryFactory();
     private static final String PT_ACCESS_STATION_COORDINATES = "access_station_coordinates.csv.gz";
 
-    private final Collection<SimpleFeature> zones;
+//    private final Collection<SimpleFeature> zones;
     private final Map<String, SimpleFeature> zonesById;
     private final String zonesIdAttributeName;
     private final SpatialIndex zonesQt;
@@ -112,16 +112,16 @@ public class MyCalculateSkimMatricesWithAccessMode {
         this.numberOfThreads = numberOfThreads;
 
         log.info("loading zones from " + zonesShapeFilename);
-        this.zones = new ShapeFileReader().readFileAndInitialize(zonesShapeFilename);
+        //this.zones = new ShapeFileReader().readFileAndInitialize(zonesShapeFilename);
         this.zonesIdAttributeName = zonesIdAttributeName;
         this.zonesById = new HashMap<>();
         this.zonesQt = new Quadtree();
-        for (SimpleFeature zone : this.zones) {
-            String zoneId = zone.getAttribute(zonesIdAttributeName).toString();
-            this.zonesById.put(zoneId, zone);
-            Envelope envelope = ((Geometry) (zone.getDefaultGeometry())).getEnvelopeInternal();
-            this.zonesQt.insert(envelope, zone);
-        }
+//        for (SimpleFeature zone : this.zones) {
+//            String zoneId = zone.getAttribute(zonesIdAttributeName).toString();
+//            this.zonesById.put(zoneId, zone);
+//            Envelope envelope = ((Geometry) (zone.getDefaultGeometry())).getEnvelopeInternal();
+//            this.zonesQt.insert(envelope, zone);
+//        }
     }
 
     public final void calculateSamplingPointsPerZoneFromFacilities(String facilitiesFilename, int numberOfPointsPerZone, Random r, ToDoubleFunction<ActivityFacility> weightFunction) throws IOException {

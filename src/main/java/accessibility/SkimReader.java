@@ -16,14 +16,10 @@ import java.util.zip.GZIPInputStream;
 public class SkimReader {
 
     private int positionOrigin;
-
     private int positionDestination;
     private int positionvalue;
-
     private static final Logger logger = Logger.getLogger(SkimReader.class);
-
     private BufferedReader reader;
-
     private int numberOfRecords = 0;
 
     public IndexedDoubleMatrix2D readAndConvertToDoubleMatrix2D(String fileName, double factor, Collection<? extends Id> zoneLookup) {
@@ -32,7 +28,6 @@ public class SkimReader {
         read(fileName, ";", factor);
         return matrix;
     }
-
 
     private void processHeader(String[] header) {
         positionOrigin = MitoUtil.findPositionInArray("FROM", header);
@@ -84,11 +79,12 @@ public class SkimReader {
         }
         logger.info(this.getClass().getSimpleName() + ": Read " + numberOfRecords + " records.");
     }
-
-
+//        //For internal only
+//        if (!Double.isNaN(time) && time != 0 && (origin <= 11717 && destination <= 11717)){
+//            matrix.setIndexed(origin, destination, time);
+//        }
     private void initializeReader(String filePath, String delimiter) {
         try {
-
             GZIPInputStream in = new GZIPInputStream(new FileInputStream(filePath));
             reader = new BufferedReader(new InputStreamReader(in));
             processHeader(reader.readLine().split(delimiter));

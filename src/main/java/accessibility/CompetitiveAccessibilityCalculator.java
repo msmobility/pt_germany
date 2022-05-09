@@ -1,26 +1,23 @@
 package accessibility;
 
-import de.tum.bgu.msm.data.Id;
-import de.tum.bgu.msm.io.input.readers.CsvGzSkimMatrixReader;
 import de.tum.bgu.msm.util.MitoUtil;
-import de.tum.bgu.msm.util.matrices.IndexedDoubleMatrix1D;
 import de.tum.bgu.msm.util.matrices.IndexedDoubleMatrix2D;
-import de.tum.bgu.msm.utils.CSVFileReader2;
 
 import java.io.*;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-public class AccessibilityCalculator {
+public class CompetitiveAccessibilityCalculator {
 
     String zoneFile = "D:/data/cape/zoneSystem/TAZs_completed_11879.csv";
     Map<Integer, ZoneForSkim> zoneMap = new HashMap<>();
+    Map<String, Map<Double, Map<Double, Map<Integer, Double>>>> competition = new HashMap<>();
     Map<String, Map<Double, Map<Double, Map<Integer, Double>>>> accessibility = new HashMap<>();
     Map<String, Map<Double, Map<Double, Map<Integer, Double>>>> accessibilityNormalized = new HashMap<>();
 
     public static void main(String[] args) throws IOException {
-        AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator();
+        CompetitiveAccessibilityCalculator accessibilityCalculator = new CompetitiveAccessibilityCalculator();
         accessibilityCalculator.readZoneData();
         accessibilityCalculator.run();
         accessibilityCalculator.printResultWide();
@@ -68,11 +65,10 @@ public class AccessibilityCalculator {
 
         Map<String, String> matrices = new HashMap<>();
         matrices.put("carFreeFlow", "./output/skims/freeflow_3points_pop/car_traveltimes.csv.gz");
+        //matrices.put("carCongested_0800", "./output/skims/congested_0800_3points_pop/car_traveltimes.csv.gz");
         matrices.put("carCongested_1700", "./output/skims/congested_1700_3points_pop/car_traveltimes.csv.gz");
-        matrices.put("ld_rail", "./output/skims/ld_rail_with_walk/ld_rail_with_walk_pt_traveltimes.csv.gz");
-        matrices.put("ld_bus", "./output/skims/ld_bus_carlos/ld_bus_v3_pt_traveltimes.csv.gz");
-        matrices.put("air", "./output/skims/air_freeflow/airTravelTimeSec_europe.csv.gz");
-        matrices.put("bmt", "./output/skims/bmt_with_walk_60min_access1km_step3600sec_pop_de_20220428/pt_travel_times.csv.gz");
+        //matrices.put("ld_rail", "./output/skims/ld_rail_with_walk/ld_rail_with_walk_pt_traveltimes.csv.gz");
+        //matrices.put("ld_bus", "./output/skims/ld_bus_carlos/ld_bus_v3_pt_traveltimes.csv.gz");
 
         double[] alphaSets = {0.8, 1.0};
         double[] betaSets = {-0.4, -0.6, -0.8, -1.0, -2.0};
@@ -80,13 +76,44 @@ public class AccessibilityCalculator {
         double beta;
 
         for (String skim : matrices.keySet()) {
+            competition.put(skim, new HashMap<>());
             accessibility.put(skim, new HashMap<>());
             accessibilityNormalized.put(skim, new HashMap<>());
             SkimReader reader = new SkimReader();
-
             IndexedDoubleMatrix2D mat = reader.readAndConvertToDoubleMatrix2D(matrices.get(skim), 1. / 3600., zoneMap.values());
             int[] lookupArray = mat.getRowLookupArray();
 
+            //competition
+            for (double alphaSet : alphaSets) {
+                alpha = alphaSet;
+                competition.get(skim).put(alpha, new HashMap<>());
+
+                for (double betaSet : betaSets) {
+
+                    IndexedDoubleMatrix2D matCalculation = new IndexedDoubleMatrix2D(lookupArray);
+                    matCalculation.assign(mat);
+
+                    beta = betaSet;
+                    competition.get(skim).get(alpha).put(beta, new HashMap<>());
+
+                    double currentBeta = beta;
+                    double currentAlpha = alpha;
+
+                    matCalculation.forEachNonZero((i, k, x) -> Math.exp(currentBeta * x));
+                    int[] rowLookupArray = matCalculation.getRowLookupArray();
+                    matCalculation.forEachNonZero((i, k, x) -> x *
+                            Math.pow(zoneMap.get(rowLookupArray[i]).getPopulation(), currentAlpha));
+
+                    for (int col : matCalculation.getColumnLookupArray()) {
+                        double[] array = matCalculation.viewRow(col).toNonIndexedArray();
+                        double competence = Arrays.stream(array).sum();
+                        this.competition.get(skim).get(alpha).get(beta).put(col, competence);
+                    }
+                }
+            }
+            System.out.println("Done competence calculation.");
+
+            //potential
             for (double alphaSet : alphaSets) {
                 alpha = alphaSet;
                 accessibility.get(skim).put(alpha, new HashMap<>());
@@ -107,7 +134,7 @@ public class AccessibilityCalculator {
                     matCalculation.forEachNonZero((i, k, x) -> Math.exp(currentBeta * x));
                     int[] rowLookupArray = matCalculation.getRowLookupArray();
                     matCalculation.forEachNonZero((i, k, x) -> x *
-                            Math.pow(zoneMap.get(rowLookupArray[k]).getEmployment(), currentAlpha));
+                            Math.pow(zoneMap.get(rowLookupArray[k]).getEmployment(), currentAlpha) / competition.get(skim).get(currentAlpha).get(currentBeta).get(rowLookupArray[k]));
 
                     double maxAccessibility = 0;
                     double minAccessibility = 999999;
@@ -142,7 +169,7 @@ public class AccessibilityCalculator {
 
     private void printResultWide() throws FileNotFoundException {
 
-        PrintWriter pw = new PrintWriter("./output/accessibility/potential_employment_11879_wide_20220505.csv");
+        PrintWriter pw = new PrintWriter("./output/accessibility/competitive_emp_11879_wide_20220117_col.csv");
 
         StringBuilder header = new StringBuilder();
         header.append("zone").append(",");
@@ -184,7 +211,7 @@ public class AccessibilityCalculator {
 
     private void printResult() throws FileNotFoundException {
 
-        PrintWriter pw = new PrintWriter("./output/accessibility/potential_employment_11879_long_20220505.csv");
+        PrintWriter pw = new PrintWriter("./output/accessibility/competitive_emp_11879_long_20220117_col.csv");
         pw.print("zone,skim,alpha,beta,accessibility,scaledAccessibility");
         pw.println();
 

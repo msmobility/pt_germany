@@ -86,7 +86,7 @@
         <dependency>
             <groupId>de.tum.bgu.msm</groupId>
             <artifactId>siloCore</artifactId>
-            <version>master</version>
+            <version>0.1.0-20211201.205931-28</version>
         </dependency>
         <dependency>
             <groupId>de.tum.bgu.msm</groupId>
